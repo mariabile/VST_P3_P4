@@ -20,7 +20,7 @@ jobs:
           python-version: '3.10'
 
       - name: Install Dependencies
-        run: pip install matplotlib
+        run: pip install matplotlib pandas numpy
 
       - name: Fetch ESO Data & Generate Plot
         run: python update_eso.py
