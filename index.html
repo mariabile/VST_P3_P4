@@ -56,14 +56,15 @@
 				background: #ffffff;
 			}
 
+			/* Crisp status message box */
 			.status-msg {
 				margin-bottom: 15px;
 				font-style: normal;
 				font-weight: 600;
-				font-size: 1rem;
+				font-size: 0.95rem;
 				color: #1e293b;
 				background: #e2e8f0;
-				padding: 10px 15px;
+				padding: 8px 14px;
 				border-radius: 6px;
 				display: inline-block;
 			}
@@ -75,15 +76,22 @@
 			}
 
 			.eso-table th, .eso-table td {
-				border: 1px solid #dee2e6;
-				padding: 10px 12px;
+				border: 1px solid #cbd5e1;
+				padding: 12px 14px;
 				text-align: left;
 			}
 
+			/* Crisp, High-Legibility Header Override */
 			.eso-table th {
-				background-color: #003366;
-				color: #ffffff;
-				font-weight: 600;
+				font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+				background-color: #003366 !important;
+				color: #ffffff !important;
+				font-size: 0.95rem !important;
+				font-weight: 600 !important;
+				letter-spacing: 0.5px !important;
+				line-height: 1.4 !important;
+				text-transform: none !important;
+				-webkit-font-smoothing: antialiased !important;
 			}
 
 			.eso-table tr:nth-child(even) {
@@ -93,7 +101,7 @@
 			.badge {
 				background: #e2e8f0;
 				color: #1e293b;
-				padding: 3px 8px;
+				padding: 4px 8px;
 				border-radius: 4px;
 				font-size: 0.88rem;
 				font-family: monospace;
@@ -209,9 +217,9 @@
 
 											<figure>
 										  <img src="images/P3_P4_timeline.png" 
-    								   alt="Targets observed from 01/10/2024 to 18/05/2026" 
+    								   alt="Targets observed timeline" 
   									     width="100%">
- 										<figcaption>Targets observed from 01/10/2024 to 24/07/2026
+ 										<figcaption id="timeline-caption">Targets observed from 01/10/2024 to ...
 										</figcaption>
 										</figure>
 											
@@ -311,6 +319,7 @@
 			async function loadData() {
 				const statusEl = document.getElementById('status');
 				const nightSelect = document.getElementById('night-select');
+				const captionEl = document.getElementById('timeline-caption');
 
 				try {
 					const response = await fetch('./data.json?v=' + new Date().getTime());
@@ -345,7 +354,15 @@
 						nightSelect.appendChild(opt);
 					});
 
-					statusEl.textContent = `Loaded data across ${uniqueNights.length} observing night(s).`;
+					// Update figure caption with latest query date formatted DD/MM/YYYY
+					if (uniqueNights.length > 0) {
+						const lastNight = uniqueNights[uniqueNights.length - 1]; // Latest night
+						const [yyyy, mm, dd] = lastNight.split('-');
+						captionEl.textContent = `Targets observed from 01/10/2024 to ${dd}/${mm}/${yyyy}`;
+					}
+
+					// Shows strictly the total number of observing nights
+					statusEl.textContent = `${uniqueNights.length} observing night(s) loaded.`;
 					renderTable();
 
 				} catch (err) {
