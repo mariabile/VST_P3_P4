@@ -26,8 +26,10 @@ COLOR_MAP = {
 
 
 def get_observing_night(utc_str):
-    """Offset timestamp by -12 hours to align post-midnight exposures with the observing night."""
-    dt = datetime.strptime(utc_str.split(".")[0], "%Y-%m-%dT%H:%M:%S")
+    """Offset timestamp by -12 hours so post-midnight exposures match the observing night."""
+    # Takes the first 19 chars ("YYYY-MM-DDTHH:MM:SS"), stripping 'Z' or sub-seconds
+    clean_str = str(utc_str)[:19]
+    dt = datetime.strptime(clean_str, "%Y-%m-%dT%H:%M:%S")
     offset_dt = dt - timedelta(hours=12)
     return offset_dt.date()
 
@@ -50,12 +52,12 @@ def generate_timeline_plot(observations):
     night_records = []
     for row in observations:
         target = row[0].strip() if row[0] else "Unknown"
-        obs_date = get_observing_night(row[2])
-        night_records.append((obs_date, target))
+        if row[2]:
+            obs_date = get_observing_night(row[2])
+            night_records.append((obs_date, target))
 
-    # Get unique sorted targets and dates
+    # Get unique sorted targets
     unique_targets = sorted(list(set(t for _, t in night_records)))
-    unique_dates = sorted(list(set(d for d, _ in night_records)))
 
     # Set up plot styling
     fig, ax = plt.subplots(figsize=(12, max(4, len(unique_targets) * 0.6)))
