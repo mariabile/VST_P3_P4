@@ -40,7 +40,9 @@ def load_colors():
 def get_target_color(target_name, color_map):
     """Matches target name against loaded color map."""
     for key, hex_color in color_map.items():
-        if key in target_name:
+        # Match either key (e.g., 'J1330') or number part ('1330')
+        clean_key = key.replace("J", "")
+        if key in target_name or clean_key in target_name:
             return hex_color
     return "#ffffff"  # Default white for unmapped targets
 
@@ -162,14 +164,21 @@ try:
         content = response.read().decode("utf-8")
         data = json.loads(content)
 
-        # 1. Save JSON dataset
+        observations = data.get("data", [])
+
+        # --- Automatic Name Replacement ---
+        # Replaces COOL 1330 / COOL J1330 with SDSS 1330 / SDSS J1330 in all records
+        for row in observations:
+            if row[0]:
+                row[0] = row[0].replace("COOL 1330", "SDSS 1330").replace("COOL J1330", "SDSS J1330")
+
+        # 1. Save modified JSON dataset (table reads from this)
         with open("data.json", "w") as f:
             json.dump(data, f, indent=2)
 
-        observations = data.get("data", [])
         print(f"Saved {len(observations)} observation records to data.json.")
 
-        # 2. Generate updated timeline plot
+        # 2. Generate updated timeline plot (plot reads from this)
         generate_timeline_plot(observations)
 
 except urllib.error.HTTPError as e:
