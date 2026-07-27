@@ -56,7 +56,6 @@
 				background: #ffffff;
 			}
 
-			/* Fixed crisp status message styling */
 			.status-msg {
 				margin-bottom: 15px;
 				font-style: normal;
@@ -346,7 +345,7 @@
 						nightSelect.appendChild(opt);
 					});
 
-					statusEl.textContent = `Loaded ${rawObservations.length} science exposures across ${uniqueNights.length} observing night(s).`;
+					statusEl.textContent = `Loaded data across ${uniqueNights.length} observing night(s).`;
 					renderTable();
 
 				} catch (err) {
@@ -382,7 +381,7 @@
 				// SPECIFIC NIGHT SELECTED: Exposure breakdown with seeing & airmass
 				if (selectedNight !== 'ALL') {
 					let html = `
-						<h4>Observing Night: ${selectedNight} (${filtered.length} exposures)</h4>
+						<h4>Observing Night: ${selectedNight}</h4>
 						<table class="eso-table">
 							<thead>
 								<tr>
@@ -418,13 +417,12 @@
 				const nightGroups = {};
 				filtered.forEach(obs => {
 					if (!nightGroups[obs.observingNight]) {
-						nightGroups[obs.observingNight] = { targets: new Set(), instruments: new Set(), airmasses: [], seeings: [], count: 0 };
+						nightGroups[obs.observingNight] = { targets: new Set(), instruments: new Set(), airmasses: [], seeings: [] };
 					}
 					nightGroups[obs.observingNight].targets.add(obs.target);
 					nightGroups[obs.observingNight].instruments.add(obs.instrument);
 					if (obs.airmass !== 'N/A') nightGroups[obs.observingNight].airmasses.push(parseFloat(obs.airmass));
 					if (obs.seeing !== 'N/A') nightGroups[obs.observingNight].seeings.push(parseFloat(obs.seeing));
-					nightGroups[obs.observingNight].count++;
 				});
 
 				let nightKeys = Object.keys(nightGroups).sort();
@@ -444,7 +442,6 @@
 								<th>Instrument(s)</th>
 								<th>Avg Airmass</th>
 								<th>Avg Seeing</th>
-								<th>Exposures</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -463,7 +460,6 @@
 							<td>${Array.from(data.instruments).join(', ')}</td>
 							<td>${avgAirmass}</td>
 							<td>${avgSeeing}</td>
-							<td>${data.count}</td>
 						</tr>
 					`;
 				});
