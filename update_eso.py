@@ -1,13 +1,12 @@
-from datetime import datetime, timedelta
 import json
 import os
 import traceback
 import urllib.error
 import urllib.parse
 import urllib.request
+from datetime import datetime, timedelta
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
 
 PROGRAM_ID = "114.27U3.001"
@@ -40,7 +39,6 @@ def load_colors():
 def get_target_color(target_name, color_map):
     """Matches target name against loaded color map."""
     for key, hex_color in color_map.items():
-        # Match either key (e.g., 'J1330') or number part ('1330')
         clean_key = key.replace("J", "")
         if key in target_name or clean_key in target_name:
             return hex_color
@@ -92,9 +90,7 @@ def generate_timeline_plot(observations):
     fig, ax = plt.subplots(figsize=(12, max(4, len(objects_sorted) * 0.4)))
 
     # Get colors per observation point
-    colors = [
-        get_target_color(obj, color_map) for obj in df["object"].values
-    ]
+    colors = [get_target_color(obj, color_map) for obj in df["object"].values]
 
     # Scatter plot
     ax.scatter(
@@ -116,7 +112,7 @@ def generate_timeline_plot(observations):
     ax.xaxis.set_major_formatter(mdates.DateFormatter("%b %Y"))
     fig.autofmt_xdate()
 
-    # Apply Dark Aesthetics (matching obs_timeline.py)
+    # Apply Dark Aesthetics
     fig.patch.set_facecolor("black")
     ax.set_facecolor("black")
     ax.xaxis.label.set_color("white")
@@ -164,22 +160,35 @@ try:
         content = response.read().decode("utf-8")
         data = json.loads(content)
 
-        observations = data.get("data", [])
+        raw_observations = data.get("data", [])
+        cleaned_observations = []
 
-        # --- Automatic Name Replacement ---
-        # Replaces COOL 1330 / COOL J1330 with SDSS 1330 / SDSS J1330 in all records
-        for row in observations:
-            if row[0]:
-                row[0] = row[0].replace("COOL 1330", "SDSS 1330").replace("COOL J1330", "SDSS J1330")
+        # --- Target Filtering and Name Replacements ---
+        for row in raw_observations:
+            if not row[0]:
+                continue
 
-        # 1. Save modified JSON dataset (table reads from this)
+            target_name = row[0].strip()
+
+            # Ignore PLACEHOLDER TARGET entries completely
+            if "PLACEHOLDER" in target_name.upper():
+                continue
+
+            # Rename COOL 1330 to SDSS 1330
+            row[0] = target_name.replace("COOL 1330", "SDSS 1330").replace("COOL J1330", "SDSS J1330")
+            cleaned_observations.append(row)
+
+        # Update data payload with cleaned observation records
+        data["data"] = cleaned_observations
+
+        # 1. Save cleaned JSON dataset
         with open("data.json", "w") as f:
             json.dump(data, f, indent=2)
 
-        print(f"Saved {len(observations)} observation records to data.json.")
+        print(f"Saved {len(cleaned_observations)} observation records to data.json.")
 
-        # 2. Generate updated timeline plot (plot reads from this)
-        generate_timeline_plot(observations)
+        # 2. Generate updated timeline plot
+        generate_timeline_plot(cleaned_observations)
 
 except urllib.error.HTTPError as e:
     print(f"HTTP Error {e.code}: {e.reason}")
