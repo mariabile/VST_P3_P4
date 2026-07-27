@@ -14,6 +14,87 @@
 			.lowercase {
             	text-transform: lowercase;
         	}
+
+			/* --- ESO Target Inspector Custom Styles --- */
+			.eso-inspector-container {
+				margin-top: 2.5em;
+				padding-top: 2em;
+				border-top: 2px solid #e5e5e5;
+			}
+
+			.controls-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+				gap: 15px;
+				background: #f4f7f9;
+				padding: 20px;
+				border-radius: 6px;
+				margin-bottom: 20px;
+			}
+
+			.form-group {
+				display: flex;
+				flex-direction: column;
+			}
+
+			.form-group label {
+				font-weight: 600;
+				font-size: 0.85rem;
+				margin-bottom: 5px;
+				color: #475569;
+				text-transform: none;
+			}
+
+			.form-group select, .form-group input {
+				padding: 8px 12px;
+				border: 1px solid #dee2e6;
+				border-radius: 4px;
+				font-size: 0.95rem;
+				width: 100%;
+				box-sizing: border-box;
+				height: auto;
+				background: #ffffff;
+			}
+
+			.status-msg {
+				margin-bottom: 15px;
+				font-style: italic;
+				color: #64748b;
+			}
+
+			.eso-table {
+				width: 100%;
+				border-collapse: collapse;
+				margin-top: 10px;
+			}
+
+			.eso-table th, .eso-table td {
+				border: 1px solid #dee2e6;
+				padding: 10px 12px;
+				text-align: left;
+			}
+
+			.eso-table th {
+				background-color: #003366;
+				color: #ffffff;
+				font-weight: 600;
+			}
+
+			.eso-table tr:nth-child(even) {
+				background-color: #f8fafc;
+			}
+
+			.badge {
+				background: #e2e8f0;
+				color: #1e293b;
+				padding: 3px 8px;
+				border-radius: 4px;
+				font-size: 0.88rem;
+				font-family: monospace;
+				font-weight: bold;
+				display: inline-block;
+				margin: 2px;
+			}
 		</style>
 	</head>
 	<body class="homepage is-preload">
@@ -53,21 +134,7 @@
 										
 													</ul>
 												</li>
-												<li>
-												<a href="#">AGN variability</a>
-                                                    <ul>
-                                                        <li><a href="J0501-0733_agn.html">J0501-0733</a></li>
-                                                        <li><a href="J0542-2125_agn.html">J0542-2125</a></li>
-                                                        <li><a href="J0722-3901_agn.html">J0722-3901</a></li>
-                                                        <li><a href="J1029+2623_agn.html">J1029+2623</a></li>
-                                                        <li><a href="J2107-1611_agn.html">J2107-1611</a></li>
-                                                        <li><a href="J0335-1927_agn.html">J0335-1927</a></li>
-                                                        <li><a href="J1330+1810_agn.html">J1330+1810</a></li>
-                                                        <li><a href="J2329-1258_agn.html">J2329-1258</a></li>
-														<li><a href="J0123-0455_agn.html">J0123-0455</a></li>
-
-                                                    </ul>
-                                                </li>
+												
                                                 <li>
                                                     <a href="#">Ancillary Data</a>
                                                     <ul>
@@ -117,8 +184,35 @@
 										</figcaption>
 										</figure>
 											
-										</header>
+										<!-- ESO Target Inspector Section -->
+										<div class="eso-inspector-container">
+											<h3>Observed Targets by Night (Program 114.27U3.001)</h3>
+
+											<div class="controls-grid">
+												<div class="form-group">
+													<label for="night-select">Select Specific Night</label>
+													<select id="night-select">
+														<option value="ALL">Loading observing nights...</option>
+													</select>
+												</div>
+
+												<div class="form-group">
+													<label for="start-date">From Date</label>
+													<input type="date" id="start-date">
+												</div>
+
+												<div class="form-group">
+													<label for="end-date">To Date</label>
+													<input type="date" id="end-date">
+												</div>
+											</div>
+
+											<div id="status" class="status-msg">Loading data from archive...</div>
+											<div id="table-container"></div>
 										</div>
+
+										</div>
+									</div>
 								</section>
 
 						</div>
@@ -132,22 +226,23 @@
 							<div class="col-3 col-6-medium col-12-small">
 								<!-- Contact -->
 									<section>
-										<h2>Contact us <i class="fa fa-envelope" style="font-size:20px" style="color:white"></i></h2>
+										<h2>Contact us <i class="fa fa-envelope" style="font-size:20px; color:white;"></i></h2>
 										<div>
 											<div class="row">
 													<dl class="contact">
 														<a href="mailto:marianna.annunziatella@inaf.it">Marianna Annunziatella</a>
 													</dl>
+											</div>
+										</div>
 									</section>
 							</div>
-							</div>
-										<div class="col-3 col-6-medium col-12-small">
+							<div class="col-3 col-6-medium col-12-small">
 								<h2 style="font-size:18px; ">Website last update: </h2>	<p style="font-size:16px; margin-top: -20px" > <script>document.write(  new Date(document.lastModified) );</script></p>
-								</div>
+							</div>
 
-								<div class="col-3 col-6-medium col-12-small">
-									<h2 style="font-size:18px; ">Website credits: </h2>	<p style="font-size:16px; margin-top: -20px" > M. Annunziatella </p>
-									</div>
+							<div class="col-3 col-6-medium col-12-small">
+								<h2 style="font-size:18px; ">Website credits: </h2>	<p style="font-size:16px; margin-top: -20px" > M. Annunziatella </p>
+							</div>
 						</div>
 					</footer>
 				</div>
@@ -161,6 +256,172 @@
 			<script src="assets/js/breakpoints.min.js"></script>
 			<script src="assets/js/util.js"></script>
 			<script src="assets/js/main.js"></script>
+
+		<!-- ESO Data Loader Script -->
+		<script>
+			let rawObservations = [];
+
+			// Subtracts 12 hours so post-midnight exposures match the observing night
+			function getObservingNight(utcDateString) {
+				const d = new Date(utcDateString);
+				const offsetDate = new Date(d.getTime() - (12 * 60 * 60 * 1000));
+				return offsetDate.toISOString().split('T')[0];
+			}
+
+			async function loadData() {
+				const statusEl = document.getElementById('status');
+				const nightSelect = document.getElementById('night-select');
+
+				try {
+					const response = await fetch('./data.json?v=' + new Date().getTime());
+					if (!response.ok) throw new Error("data.json not ready yet.");
+
+					const result = await response.json();
+
+					if (!result.data || result.data.length === 0) {
+						statusEl.textContent = "No observations found for Program ID 114.27U3.001.";
+						nightSelect.innerHTML = `<option value="ALL">-- No Nights Available --</option>`;
+						return;
+					}
+
+					// Parse fields: [0]=target, [1]=instrument, [2]=dp_start, [3]=tel_airm_start, [4]=tel_ambi_fwhm_start
+					rawObservations = result.data.map(row => ({
+						target: row[0] ? row[0].trim() : 'Unknown Target',
+						instrument: row[1] || 'N/A',
+						dpStart: row[2],
+						airmass: row[3] ? parseFloat(row[3]).toFixed(2) : 'N/A',
+						seeing: row[4] ? parseFloat(row[4]).toFixed(2) + '"' : 'N/A',
+						observingNight: getObservingNight(row[2])
+					}));
+
+					// Populate unique nights dropdown
+					const uniqueNights = [...new Set(rawObservations.map(o => o.observingNight))].sort();
+					nightSelect.innerHTML = `<option value="ALL">All Nights (${uniqueNights.length})</option>`;
+					
+					uniqueNights.forEach(night => {
+						const opt = document.createElement('option');
+						opt.value = night;
+						opt.textContent = night;
+						nightSelect.appendChild(opt);
+					});
+
+					statusEl.textContent = `Loaded ${rawObservations.length} science exposures across ${uniqueNights.length} observing night(s).`;
+					renderTable();
+
+				} catch (err) {
+					console.error(err);
+					statusEl.textContent = "Data is generating in the cloud. Run the GitHub Action or wait 1 minute and refresh.";
+				}
+			}
+
+			function renderTable() {
+				const selectedNight = document.getElementById('night-select').value;
+				const startDate = document.getElementById('start-date').value;
+				const endDate = document.getElementById('end-date').value;
+				const tableContainer = document.getElementById('table-container');
+
+				let filtered = rawObservations.filter(obs => {
+					if (selectedNight !== 'ALL' && obs.observingNight !== selectedNight) return false;
+					if (startDate && obs.observingNight < startDate) return false;
+					if (endDate && obs.observingNight > endDate) return false;
+					return true;
+				});
+
+				if (filtered.length === 0) {
+					tableContainer.innerHTML = "<p>No target observations match the selected criteria.</p>";
+					return;
+				}
+
+				// SPECIFIC NIGHT SELECTED: Exposure breakdown with seeing & airmass
+				if (selectedNight !== 'ALL') {
+					let html = `
+						<h4>Observing Night: ${selectedNight} (${filtered.length} exposures)</h4>
+						<table class="eso-table">
+							<thead>
+								<tr>
+									<th>Target</th>
+									<th>Instrument</th>
+									<th>Start Time (UTC)</th>
+									<th>Airmass</th>
+									<th>Seeing (FWHM)</th>
+								</tr>
+							</thead>
+							<tbody>
+					`;
+
+					filtered.forEach(obs => {
+						const timeOnly = obs.dpStart.replace('T', ' ').substring(0, 19);
+						html += `
+							<tr>
+								<td><span class="badge">${obs.target}</span></td>
+								<td>${obs.instrument}</td>
+								<td>${timeOnly}</td>
+								<td>${obs.airmass}</td>
+								<td>${obs.seeing}</td>
+							</tr>
+						`;
+					});
+
+					html += `</tbody></table>`;
+					tableContainer.innerHTML = html;
+					return;
+				}
+
+				// ALL NIGHTS SELECTED: Aggregated summary table
+				const nightGroups = {};
+				filtered.forEach(obs => {
+					if (!nightGroups[obs.observingNight]) {
+						nightGroups[obs.observingNight] = { targets: new Set(), instruments: new Set(), airmasses: [], seeings: [], count: 0 };
+					}
+					nightGroups[obs.observingNight].targets.add(obs.target);
+					nightGroups[obs.observingNight].instruments.add(obs.instrument);
+					if (obs.airmass !== 'N/A') nightGroups[obs.observingNight].airmasses.push(parseFloat(obs.airmass));
+					if (obs.seeing !== 'N/A') nightGroups[obs.observingNight].seeings.push(parseFloat(obs.seeing));
+					nightGroups[obs.observingNight].count++;
+				});
+
+				let html = `
+					<table class="eso-table">
+						<thead>
+							<tr>
+								<th>Observing Night</th>
+								<th>Targets Observed</th>
+								<th>Instrument(s)</th>
+								<th>Avg Airmass</th>
+								<th>Avg Seeing</th>
+								<th>Exposures</th>
+							</tr>
+						</thead>
+						<tbody>
+				`;
+
+				for (const [night, data] of Object.entries(nightGroups)) {
+					const targetList = Array.from(data.targets).map(t => `<span class="badge">${t}</span>`).join(' ');
+					const avgAirmass = data.airmasses.length ? (data.airmasses.reduce((a,b)=>a+b, 0)/data.airmasses.length).toFixed(2) : 'N/A';
+					const avgSeeing = data.seeings.length ? (data.seeings.reduce((a,b)=>a+b, 0)/data.seeings.length).toFixed(2) + '"' : 'N/A';
+					
+					html += `
+						<tr>
+							<td><strong>${night}</strong></td>
+							<td>${targetList}</td>
+							<td>${Array.from(data.instruments).join(', ')}</td>
+							<td>${avgAirmass}</td>
+							<td>${avgSeeing}</td>
+							<td>${data.count}</td>
+						</tr>
+					`;
+				}
+
+				html += `</tbody></table>`;
+				tableContainer.innerHTML = html;
+			}
+
+			document.getElementById('night-select').addEventListener('change', renderTable);
+			document.getElementById('start-date').addEventListener('change', renderTable);
+			document.getElementById('end-date').addEventListener('change', renderTable);
+
+			window.addEventListener('DOMContentLoaded', loadData);
+		</script>
 
 	</body>
 </html>
