@@ -7,114 +7,133 @@ import urllib.parse
 import urllib.request
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 
 PROGRAM_ID = "114.27U3.001"
 clean_id = PROGRAM_ID.lstrip("0")
 
-# Color map provided for targets
-COLOR_MAP = {
-    "J0501": "#c8a6f5",
-    "J0542": "#88bef7",
-    "J0722": "#88f7dd",
-    "J1029": "#88f78e",
-    "J2107": "#f5f1a6",
-    "J0335": "#ffc185",
-    "J1330": "#ff9f7a",
-    "J0123": "#e4574f",
-    "J2329": "#ff7f66",
-}
+
+def load_colors():
+    """Loads colors.json if present, otherwise returns default color dictionary."""
+    json_path = "colors.json"
+    if os.path.exists(json_path):
+        try:
+            with open(json_path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception as e:
+            print(f"Warning: Could not read {json_path} ({e}). Using default.")
+
+    return {
+        "J0501": "#c8a6f5",
+        "J0542": "#88bef7",
+        "J0722": "#88f7dd",
+        "J1029": "#88f78e",
+        "J2107": "#f5f1a6",
+        "J0335": "#ffc185",
+        "J1330": "#ff9f7a",
+        "J0123": "#e4574f",
+        "J2329": "#ff7f66",
+    }
 
 
-def get_observing_night(utc_str):
-    """Offset timestamp by -12 hours so post-midnight exposures match the observing night."""
-    # Takes the first 19 chars ("YYYY-MM-DDTHH:MM:SS"), stripping 'Z' or sub-seconds
+def get_target_color(target_name, color_map):
+    """Matches target name against loaded color map."""
+    for key, hex_color in color_map.items():
+        if key in target_name:
+            return hex_color
+    return "#ffffff"  # Default white for unmapped targets
+
+
+def parse_utc_dt(utc_str):
+    """Parses ESO UTC date string into a datetime object with -12h observing night offset."""
     clean_str = str(utc_str)[:19]
     dt = datetime.strptime(clean_str, "%Y-%m-%dT%H:%M:%S")
-    offset_dt = dt - timedelta(hours=12)
-    return offset_dt.date()
-
-
-def get_target_color(target_name):
-    """Matches target name against custom color dictionary."""
-    for prefix, hex_color in COLOR_MAP.items():
-        if prefix in target_name:
-            return hex_color
-    return "#888888"  # Fallback gray for unlisted targets
+    return dt - timedelta(hours=12)
 
 
 def generate_timeline_plot(observations):
-    """Generates and saves the timeline figure using matplotlib."""
+    """Generates and saves the dark-themed timeline figure matching obs_timeline.py."""
     if not observations:
         print("No observations available to generate timeline plot.")
         return
 
-    # Extract unique (date, target) pairs
-    night_records = []
+    color_map = load_colors()
+
+    # Parse observations into DataFrame
+    data_list = []
     for row in observations:
         target = row[0].strip() if row[0] else "Unknown"
-        if row[2]:
-            obs_date = get_observing_night(row[2])
-            night_records.append((obs_date, target))
+        exp_start = row[2]
+        if exp_start:
+            dt_display = parse_utc_dt(exp_start)
+            data_list.append({"object": target, "dt_display": dt_display})
 
-    # Get unique sorted targets
-    unique_targets = sorted(list(set(t for _, t in night_records)))
+    df = pd.DataFrame(data_list)
+    if df.empty:
+        print("No valid timestamps found for timeline plot.")
+        return
 
-    # Set up plot styling
-    fig, ax = plt.subplots(figsize=(12, max(4, len(unique_targets) * 0.6)))
-    ax.set_facecolor("#f8fafc")
-    fig.patch.set_facecolor("#ffffff")
+    # Determine chronological order by first observation time per object
+    objects_sorted = (
+        df.groupby("object")["dt_display"]
+        .min()
+        .sort_values(kind="mergesort")
+        .index.astype(str)
+        .tolist()
+    )
 
-    # Plot observation points for each target
-    for target in unique_targets:
-        target_dates = [d for d, t in night_records if t == target]
-        target_color = get_target_color(target)
+    y_map = {obj: i for i, obj in enumerate(objects_sorted)}
+    y_vals = df["object"].map(y_map)
 
-        y_vals = [target] * len(target_dates)
-        ax.scatter(
-            target_dates,
-            y_vals,
-            color=target_color,
-            s=120,
-            edgecolors="#333333",
-            linewidth=0.8,
-            zorder=3,
-            label=target,
-        )
+    # Plot styling setup
+    fig, ax = plt.subplots(figsize=(12, max(4, len(objects_sorted) * 0.4)))
+
+    # Get colors per observation point
+    colors = [
+        get_target_color(obj, color_map) for obj in df["object"].values
+    ]
+
+    # Scatter plot
+    ax.scatter(
+        df["dt_display"].values,
+        y_vals.values,
+        s=16.0,
+        alpha=1,
+        edgecolor="none",
+        c=colors,
+    )
 
     # Format Axes
-    ax.set_title(
-        f"VST Program {PROGRAM_ID} - Observation Timeline",
-        fontsize=14,
-        fontweight="bold",
-        pad=15,
-        color="#003366",
-    )
-    ax.set_xlabel("Observing Date", fontsize=11, fontweight="bold", labelpad=10)
-    ax.set_ylabel("Target", fontsize=11, fontweight="bold", labelpad=10)
+    ax.set_yticks(list(y_map.values()), list(y_map.keys()))
+    ax.set_xlabel("Date (UTC)", labelpad=10)
+    ax.set_ylabel("Target", labelpad=10)
 
-    # Date formatting on X-axis
-    ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m-%d"))
-    ax.xaxis.set_major_locator(mdates.AutoDateLocator())
+    # X-axis date formatting (monthly ticks)
+    ax.xaxis.set_major_locator(mdates.MonthLocator())
+    ax.xaxis.set_major_formatter(mdates.DateFormatter("%b %Y"))
     fig.autofmt_xdate()
 
-    # Gridlines & Spacing
-    ax.grid(True, linestyle="--", alpha=0.5, color="#cbd5e1", zorder=1)
-    ax.spines["top"].set_visible(False)
-    ax.spines["right"].set_visible(False)
-    ax.spines["left"].set_color("#94a3b8")
-    ax.spines["bottom"].set_color("#94a3b8")
+    # Apply Dark Aesthetics (matching obs_timeline.py)
+    fig.patch.set_facecolor("black")
+    ax.set_facecolor("black")
+    ax.xaxis.label.set_color("white")
+    ax.yaxis.label.set_color("white")
+    ax.tick_params(axis="x", colors="white")
+    ax.tick_params(axis="y", colors="white")
 
-    plt.tight_layout()
+    for spine in ax.spines.values():
+        spine.set_color("white")
 
-    # Ensure images/ folder exists and save plot
+    # Ensure output directory exists and save
     os.makedirs("images", exist_ok=True)
-    plot_path = os.path.join("images", "P3_P4_timeline.png")
-    plt.savefig(plot_path, dpi=200, bbox_inches="tight")
-    plt.close()
-    print(f"Successfully updated timeline plot at '{plot_path}'!")
+    out_png = os.path.join("images", "P3_P4_timeline.png")
+    fig.savefig(out_png, dpi=160, bbox_inches="tight")
+    plt.close(fig)
+    print(f"Successfully generated and saved plot to: {out_png}")
 
 
-# Main Execution
+# --- Main Data Sync Execution ---
 query = f"SELECT target, instrument, exp_start, tel_airm_start, tel_ambi_fwhm_start FROM dbo.raw WHERE (prog_id LIKE '%{clean_id}%' OR prog_id LIKE '%{PROGRAM_ID}%') AND dp_cat = 'SCIENCE' ORDER BY exp_start ASC"
 
 print(f"Connecting to ESO TAP service for program {PROGRAM_ID}...")
@@ -150,7 +169,7 @@ try:
         observations = data.get("data", [])
         print(f"Saved {len(observations)} observation records to data.json.")
 
-        # 2. Re-generate P3_P4_timeline.png with custom colors
+        # 2. Generate updated timeline plot
         generate_timeline_plot(observations)
 
 except urllib.error.HTTPError as e:
