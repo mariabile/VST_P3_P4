@@ -5,7 +5,6 @@
 	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
 -->
 <html>
-	
 	<head>
         <meta name="robots" content="noindex, nofollow">
 		<title>VST P3-P4</title>
@@ -25,7 +24,7 @@
 
 			.controls-grid {
 				display: grid;
-				grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+				grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
 				gap: 15px;
 				background: #f4f7f9;
 				padding: 20px;
@@ -57,10 +56,17 @@
 				background: #ffffff;
 			}
 
+			/* Fixed crisp status message styling */
 			.status-msg {
 				margin-bottom: 15px;
-				font-style: italic;
-				color: #64748b;
+				font-style: normal;
+				font-weight: 600;
+				font-size: 1rem;
+				color: #1e293b;
+				background: #e2e8f0;
+				padding: 10px 15px;
+				border-radius: 6px;
+				display: inline-block;
 			}
 
 			.eso-table {
@@ -95,6 +101,31 @@
 				font-weight: bold;
 				display: inline-block;
 				margin: 2px;
+			}
+
+			.table-footer-controls {
+				margin-top: 15px;
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				flex-wrap: wrap;
+				gap: 10px;
+			}
+
+			.btn-toggle {
+				background-color: #003366 !important;
+				color: #ffffff !important;
+				border: none;
+				padding: 8px 18px;
+				border-radius: 4px;
+				cursor: pointer;
+				font-weight: 600;
+				font-size: 0.9rem;
+				box-shadow: none;
+			}
+
+			.btn-toggle:hover {
+				background-color: #0066cc !important;
 			}
 		</style>
 	</head>
@@ -206,6 +237,14 @@
 													<label for="end-date">To Date</label>
 													<input type="date" id="end-date">
 												</div>
+
+												<div class="form-group">
+													<label for="sort-order">Sort Nights</label>
+													<select id="sort-order">
+														<option value="ASC">Oldest First</option>
+														<option value="DESC">Newest First</option>
+													</select>
+												</div>
 											</div>
 
 											<div id="status" class="status-msg">Loading data from archive...</div>
@@ -261,6 +300,7 @@
 		<!-- ESO Data Loader Script -->
 		<script>
 			let rawObservations = [];
+			let showAllRows = false;
 
 			// Subtracts 12 hours so post-midnight exposures match the observing night
 			function getObservingNight(utcDateString) {
@@ -285,11 +325,11 @@
 						return;
 					}
 
-					// Parse fields: [0]=target, [1]=instrument, [2]=dp_start, [3]=tel_airm_start, [4]=tel_ambi_fwhm_start
+					// Parse fields: [0]=target, [1]=instrument, [2]=exp_start, [3]=tel_airm_start, [4]=tel_ambi_fwhm_start
 					rawObservations = result.data.map(row => ({
 						target: row[0] ? row[0].trim() : 'Unknown Target',
 						instrument: row[1] || 'N/A',
-						dpStart: row[2],
+						expStart: row[2],
 						airmass: row[3] ? parseFloat(row[3]).toFixed(2) : 'N/A',
 						seeing: row[4] ? parseFloat(row[4]).toFixed(2) + '"' : 'N/A',
 						observingNight: getObservingNight(row[2])
@@ -315,10 +355,16 @@
 				}
 			}
 
+			function toggleRowsDisplay() {
+				showAllRows = !showAllRows;
+				renderTable();
+			}
+
 			function renderTable() {
 				const selectedNight = document.getElementById('night-select').value;
 				const startDate = document.getElementById('start-date').value;
 				const endDate = document.getElementById('end-date').value;
+				const sortOrder = document.getElementById('sort-order').value;
 				const tableContainer = document.getElementById('table-container');
 
 				let filtered = rawObservations.filter(obs => {
@@ -351,7 +397,7 @@
 					`;
 
 					filtered.forEach(obs => {
-						const timeOnly = obs.dpStart.replace('T', ' ').substring(0, 19);
+						const timeOnly = obs.expStart.replace('T', ' ').substring(0, 19);
 						html += `
 							<tr>
 								<td><span class="badge">${obs.target}</span></td>
@@ -381,6 +427,14 @@
 					nightGroups[obs.observingNight].count++;
 				});
 
+				let nightKeys = Object.keys(nightGroups).sort();
+				if (sortOrder === 'DESC') {
+					nightKeys.reverse();
+				}
+
+				const totalNights = nightKeys.length;
+				const displayKeys = showAllRows ? nightKeys : nightKeys.slice(0, 10);
+
 				let html = `
 					<table class="eso-table">
 						<thead>
@@ -396,7 +450,8 @@
 						<tbody>
 				`;
 
-				for (const [night, data] of Object.entries(nightGroups)) {
+				displayKeys.forEach(night => {
+					const data = nightGroups[night];
 					const targetList = Array.from(data.targets).map(t => `<span class="badge">${t}</span>`).join(' ');
 					const avgAirmass = data.airmasses.length ? (data.airmasses.reduce((a,b)=>a+b, 0)/data.airmasses.length).toFixed(2) : 'N/A';
 					const avgSeeing = data.seeings.length ? (data.seeings.reduce((a,b)=>a+b, 0)/data.seeings.length).toFixed(2) + '"' : 'N/A';
@@ -411,15 +466,30 @@
 							<td>${data.count}</td>
 						</tr>
 					`;
-				}
+				});
 
 				html += `</tbody></table>`;
+
+				// Pagination controls below table
+				if (totalNights > 10) {
+					const buttonText = showAllRows ? `Show First 10 Nights` : `Show All ${totalNights} Nights`;
+					const rangeText = showAllRows ? `Showing all ${totalNights} observing nights` : `Showing first 10 of ${totalNights} observing nights`;
+					
+					html += `
+						<div class="table-footer-controls">
+							<span><strong>${rangeText}</strong></span>
+							<button class="btn-toggle" onclick="toggleRowsDisplay()">${buttonText}</button>
+						</div>
+					`;
+				}
+
 				tableContainer.innerHTML = html;
 			}
 
 			document.getElementById('night-select').addEventListener('change', renderTable);
 			document.getElementById('start-date').addEventListener('change', renderTable);
 			document.getElementById('end-date').addEventListener('change', renderTable);
+			document.getElementById('sort-order').addEventListener('change', renderTable);
 
 			window.addEventListener('DOMContentLoaded', loadData);
 		</script>
