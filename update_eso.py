@@ -7,12 +7,11 @@ import urllib.request
 PROGRAM_ID = "114.27U3.001"
 clean_id = PROGRAM_ID.lstrip("0")
 
-# Single-line ADQL Query requesting target, instrument, start time, airmass, and seeing
-query = f"SELECT target, instrument, dp_start, tel_airm_start, tel_ambi_fwhm_start FROM dbo.raw WHERE (prog_id LIKE '%{clean_id}%' OR prog_id LIKE '%{PROGRAM_ID}%') AND dp_cat = 'SCIENCE' ORDER BY dp_start ASC"
+# Correct column for exposure start time in dbo.raw is 'exp_start'
+query = f"SELECT target, instrument, exp_start, tel_airm_start, tel_ambi_fwhm_start FROM dbo.raw WHERE (prog_id LIKE '%{clean_id}%' OR prog_id LIKE '%{PROGRAM_ID}%') AND dp_cat = 'SCIENCE' ORDER BY exp_start ASC"
 
 print(f"Connecting to ESO TAP service for program {PROGRAM_ID}...")
 
-# Send request via HTTP POST payload to prevent URL encoding issues
 url = "https://archive.eso.org/tap_obs/sync"
 params = {
     "REQUEST": "doQuery",
@@ -38,7 +37,7 @@ try:
         content = response.read().decode("utf-8")
         data = json.loads(content)
 
-        # Save query result to data.json
+        # Write query result to data.json
         with open("data.json", "w") as f:
             json.dump(data, f, indent=2)
 
