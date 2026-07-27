@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>J2329-1258</title>
+  <style>
+    [v-cloak] { display: none; }
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    .container { max-width: 1200px; margin: 0 auto; }
+    #plot { width: 100%; height: 700px; }
+    .card { border:1px solid #e5e5e5; border-radius:8px; background:#fafafa; padding:14px; }
+    .row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+    .row + .row { margin-top: 8px; }
+    .label { font-weight:600; margin-right:6px; }
+    .small { font-size: 12px; color:#666; }
+    .pill { padding:4px 8px; border-radius:14px; border:1px solid #ddd; background:#fff; cursor:pointer; }
+    .pill.active { background:#e7f1ff; border-color:#9ec1ff; }
+    .grid { display:grid; grid-template-columns: 1fr 320px; gap: 16px; }
+    .controls { display:grid; gap:10px; }
+    .images { max-height: 280px; overflow:auto; border:1px solid #eee; padding:8px; border-radius:8px; background:#fff; }
+    .images .row { justify-content: space-between; }
+    input[type="number"] { width: 100px; }
+    .sticky { position: sticky; top: 12px; }
+  </style>
+</head>
+<body>
+  <div id="app" v-cloak class="container">
+    <h2 style="margin-top:0;">J2329-1258</h2>
+
+    <div class="grid">
+      <div>
+        <div id="plot" class="card"></div>
+        <div class="small">
+          Tips: Click on a curve to select it. Hold Cmd/Ctrl and click to snap the nearest point of the selected curve to your click (updates ΔT, ΔM).
+        </div>
+      </div>
+
+      <div class="controls sticky">
+        <div class="card">
+          <h3 class="cp-title">Curves</h3>
+          <div class="row" v-for="c in curves" :key="c.name">
+            <label class="label">
+              <input type="checkbox" v-model="c.visible" @change="draw">
+              {{ c.name }}
+            </label>
+            <label class="small">
+              <input type="checkbox" v-model="c.showErrors" @change="draw">
+              Show errors
+            </label>
+          </div>
+          <div v-if="!curves.length" class="small">No curves found.</div>
+        </div>
+
+        <div class="card">
+          <h3 class="cp-title">Shift Selected Curve</h3>
+          <div class="row"><label class="small"><input type="checkbox" v-model="showDeltas"> Show ΔT/ΔM</label></div>
+          <div class="row">
+            <span class="small">Active:</span>
+            <button v-for="c in curves" :key="c.name" class="pill" :class="{active: activeCurve && activeCurve.name===c.name}" @click="activeCurve=c">{{c.name}}</button>
+          </div>
+          <div class="row" style="margin-top:8px;" v-if="activeCurve && showDeltas">
+            <label>ΔT <input type="number" step="0.01" v-model.number="activeCurve.offsetX" @input="draw"></label>
+            <button class="pill" @click="activeCurve.offsetX-=0.1; draw()">-0.1</button>
+            <button class="pill" @click="activeCurve.offsetX+=0.1; draw()">+0.1</button>
+          </div>
+          <div class="row" v-if="activeCurve && showDeltas">
+            <label>ΔM <input type="number" step="0.01" v-model.number="activeCurve.offsetY" @input="draw"></label>
+            <button class="pill" @click="activeCurve.offsetY-=0.01; draw()">-0.01</button>
+            <button class="pill" @click="activeCurve.offsetY+=0.01; draw()">+0.01</button>
+          </div>
+          <div class="small" v-if="showDeltas" style="margin-top:6px;">Positive ΔM shifts to fainter magnitudes (y-axis is reversed).</div>
+        </div>
+
+        
+  <!-- Images/MJD panel removed as requested -->
+
+  </div>
+
+  <script>
+    (function(){
+      const RAW = {"curves": [{"name": "A", "color": "royalblue", "visible": true, "showErrors": true, "offsetX": 0.0, "offsetY": 0.0, "x": [61165.40226809233, 61168.40418406433, 61170.38402761933, 61174.381901843, 61175.377919521336, 61176.365545343666, 61177.379324349335, 61178.370317252666, 61179.371175154, 61180.376148046664, 61181.367732171995, 61182.35498218267, 61183.382116493674, 61184.38449532033, 61185.34390916632, 61186.34300710732, 61187.333770357334, 61188.34781803433, 61189.346837191995, 61190.33214833299, 61191.333905251995, 61192.377217665664, 61193.369463822, 61194.34701776233, 61196.335708810664, 61197.31399383766, 61202.308206144335, 61203.33840766401, 61204.28780701399, 61205.31498202767, 61207.37740968467, 61208.29608931533, 61210.337006541995, 61211.32823739067, 61212.28295598366, 61213.27862772901, 61214.27929513167, 61215.26296686399, 61216.27970769867, 61217.26911554666, 61218.262920088666, 61219.262051193335, 61220.261317067, 61221.259546925336, 61222.257769545664, 61228.24543705633, 61229.23626562334, 61232.231215031, 61233.287133367325, 61234.24968354166, 61235.22337514601, 61237.35416843766, 61239.25794168434, 61242.299865441666, 61244.17936349299, 61245.17982738133, 61246.199255924665, 61247.17847933934], "y": [18.232467289424548, 18.209432632433387, 18.219012151551485, 18.233772995406913, 18.23458908576128, 18.217590814700262, 18.21403086173711, 18.21992571528992, 18.21923240899222, 18.215552232795584, 18.20645102509758, 18.210109380761455, 18.20550894437443, 18.199415561397785, 18.21109197393363, 18.194599419310116, 18.208621252920825, 18.21677427832556, 18.215559938234605, 18.204289570097306, 18.19220837300154, 18.20671944368504, 18.21040418345853, 18.21104283177579, 18.203000007151942, 18.209879490593607, 18.20595998606806, 18.202448991153048, 18.196707436894332, 18.182425253985272, 18.18097003415514, 18.197782561329923, 18.178138293543014, 18.18525015969144, 18.201677990568584, 18.18291083371196, 18.17943076827259, 18.17126804199459, 18.189763837282563, 18.2055561740734, 18.203075955764447, 18.20311133379594, 18.189425902601865, 18.191473461385954, 18.195682668625043, 18.19019025124376, 18.20245819923508, 18.19920029876951, 18.19729210944404, 18.20104775699501, 18.175993673183832, 18.179452473914523, 18.173318175768024, 18.174756173093776, 18.166112805184454, 18.155670187973115, 18.18152866839826, 18.1693584389494], "err": [0.0093199864509833, 0.0037847480045893, 0.0074420646701811, 0.0063822863176408, 0.00616640224791, 0.0105618627446882, 0.0051390054654724, 0.004023365150072, 0.0048880637716791, 0.0049912945658113, 0.0115393820589421, 0.0058803967208062, 0.0041211506367252, 0.0052844499363161, 0.005973932749312, 0.0117278246752689, 0.0045551704505542, 0.0052116372611374, 0.0057587455193782, 0.0041792474292995, 0.0115131181513312, 0.0048716646935184, 0.0039840746489868, 0.0056655723609093, 0.0061852108293885, 0.0059431644337153, 0.0041595100683916, 0.0037323025569479, 0.0075387172506605, 0.0049200095250807, 0.0039334456815036, 0.0031864642836737, 0.004932431976143, 0.0077867888709621, 0.0042265712947617, 0.0036227611212739, 0.0068527758599735, 0.0108635738786996, 0.0055988444508097, 0.0047588705598779, 0.0046070038028713, 0.0045065364700275, 0.0067077057176247, 0.0048851567091387, 0.0060952551452672, 0.0048590055335708, 0.0041566796617297, 0.0034792370772452, 0.0047787907240309, 0.0039186484155077, 0.0124775577244364, 0.0036972328712483, 0.0036133137313475, 0.0039730746260576, 0.0051167141077898, 0.0097070066664794, 0.0036843012323621, 0.0038576492800108]}, {"name": "B", "color": "mediumvioletred", "visible": true, "showErrors": true, "offsetX": 0.0, "offsetY": 0.0, "x": [61165.40226809233, 61168.40418406433, 61170.38402761933, 61174.381901843, 61175.377919521336, 61176.365545343666, 61177.379324349335, 61178.370317252666, 61179.371175154, 61180.376148046664, 61181.367732171995, 61182.35498218267, 61183.382116493674, 61184.38449532033, 61185.34390916632, 61186.34300710732, 61187.333770357334, 61188.34781803433, 61189.346837191995, 61190.33214833299, 61191.333905251995, 61192.377217665664, 61193.369463822, 61194.34701776233, 61196.335708810664, 61197.31399383766, 61202.308206144335, 61203.33840766401, 61204.28780701399, 61205.31498202767, 61207.37740968467, 61208.29608931533, 61210.337006541995, 61211.32823739067, 61212.28295598366, 61213.27862772901, 61214.27929513167, 61215.26296686399, 61216.27970769867, 61217.26911554666, 61218.262920088666, 61219.262051193335, 61220.261317067, 61221.259546925336, 61222.257769545664, 61228.24543705633, 61229.23626562334, 61232.231215031, 61233.287133367325, 61234.24968354166, 61235.22337514601, 61237.35416843766, 61239.25794168434, 61242.299865441666, 61244.17936349299, 61245.17982738133, 61246.199255924665, 61247.17847933934], "y": [19.06453195350124, 19.070446931916, 19.073490570378503, 19.064847385999293, 19.041456929516645, 19.04185124905127, 19.05535646587632, 19.06278492554324, 19.068330278715525, 19.09914342458856, 19.030470352888457, 19.06993113423418, 19.0776429716956, 19.08125109093545, 19.057429855749632, 19.065822728047888, 19.0450518560338, 19.058895439694055, 19.084558679630796, 19.072571134845695, 19.07823519716076, 19.044518926208987, 19.067426014199455, 19.064518863091507, 19.092641533648113, 19.072012086930133, 19.06053086001213, 19.068810482763094, 19.08568611354075, 19.056937074753044, 19.095280268308365, 19.05691722285916, 19.09005556229888, 19.05125556678273, 19.054763711128096, 19.097135289628746, 19.09948302437985, 19.072780453286892, 19.06872024577817, 19.07526716230154, 19.05528934725519, 19.06053003744416, 19.107333793239658, 19.091635599232525, 19.091870898864315, 19.0843336010141, 19.035975019070342, 19.05332098664404, 19.05732842256229, 19.059399599269973, 19.037414773042897, 19.079895518310884, 19.07794834819556, 19.065805325648142, 19.060642425695352, 19.059052834508535, 19.044647800375888, 19.057008209376516], "err": [0.0122579252834114, 0.0067803412232308, 0.0091776524444693, 0.0076913815874795, 0.0074440545190432, 0.0113562354673368, 0.0078641805100363, 0.0062089082635816, 0.0069233870485034, 0.0075074962541317, 0.0123709441815503, 0.0080423291460665, 0.0064078806063151, 0.0072595006495321, 0.0076165451945649, 0.0127312166065683, 0.0063531244616464, 0.0071736636953706, 0.0085075884552029, 0.0075083545506909, 0.013309378911528, 0.0080759370285671, 0.0064022945115019, 0.0078024063338394, 0.010339244317539, 0.0098996565182077, 0.0061660455535185, 0.0068982102891507, 0.009234931864867, 0.0080241506386952, 0.0064977301127506, 0.0053878859443223, 0.0074096904690155, 0.0089695847036171, 0.0064283128587443, 0.0061707426411065, 0.0086852248925892, 0.012196009153841, 0.0073587927167864, 0.0073075556512143, 0.0071949276137051, 0.006609041103628, 0.0109502331435101, 0.0087948838262752, 0.0091686495738205, 0.0073293165769544, 0.0057938332603445, 0.0054776964520322, 0.0064013922717046, 0.0060044675649853, 0.0131351445824553, 0.006148252647686, 0.006166655459204, 0.0069565984256271, 0.007322871068184, 0.0112200687796698, 0.0059085687643835, 0.0065507280886377]}], "images": [{"label": "61165.40227", "count": 1, "selected": true}, {"label": "61168.40418", "count": 1, "selected": true}, {"label": "61170.38403", "count": 1, "selected": true}, {"label": "61174.38190", "count": 1, "selected": true}, {"label": "61175.37792", "count": 1, "selected": true}, {"label": "61176.36555", "count": 1, "selected": true}, {"label": "61177.37932", "count": 1, "selected": true}, {"label": "61178.37032", "count": 1, "selected": true}, {"label": "61179.37118", "count": 1, "selected": true}, {"label": "61180.37615", "count": 1, "selected": true}, {"label": "61181.36773", "count": 1, "selected": true}, {"label": "61182.35498", "count": 1, "selected": true}, {"label": "61183.38212", "count": 1, "selected": true}, {"label": "61184.38450", "count": 1, "selected": true}, {"label": "61185.34391", "count": 1, "selected": true}, {"label": "61186.34301", "count": 1, "selected": true}, {"label": "61187.33377", "count": 1, "selected": true}, {"label": "61188.34782", "count": 1, "selected": true}, {"label": "61189.34684", "count": 1, "selected": true}, {"label": "61190.33215", "count": 1, "selected": true}, {"label": "61191.33391", "count": 1, "selected": true}, {"label": "61192.37722", "count": 1, "selected": true}, {"label": "61193.36946", "count": 1, "selected": true}, {"label": "61194.34702", "count": 1, "selected": true}, {"label": "61196.33571", "count": 1, "selected": true}, {"label": "61197.31399", "count": 1, "selected": true}, {"label": "61202.30821", "count": 1, "selected": true}, {"label": "61203.33841", "count": 1, "selected": true}, {"label": "61204.28781", "count": 1, "selected": true}, {"label": "61205.31498", "count": 1, "selected": true}, {"label": "61207.37741", "count": 1, "selected": true}, {"label": "61208.29609", "count": 1, "selected": true}, {"label": "61210.33701", "count": 1, "selected": true}, {"label": "61211.32824", "count": 1, "selected": true}, {"label": "61212.28296", "count": 1, "selected": true}, {"label": "61213.27863", "count": 1, "selected": true}, {"label": "61214.27930", "count": 1, "selected": true}, {"label": "61215.26297", "count": 1, "selected": true}, {"label": "61216.27971", "count": 1, "selected": true}, {"label": "61217.26912", "count": 1, "selected": true}, {"label": "61218.26292", "count": 1, "selected": true}, {"label": "61219.26205", "count": 1, "selected": true}, {"label": "61220.26132", "count": 1, "selected": true}, {"label": "61221.25955", "count": 1, "selected": true}, {"label": "61222.25777", "count": 1, "selected": true}, {"label": "61228.24544", "count": 1, "selected": true}, {"label": "61229.23627", "count": 1, "selected": true}, {"label": "61232.23122", "count": 1, "selected": true}, {"label": "61233.28713", "count": 1, "selected": true}, {"label": "61234.24968", "count": 1, "selected": true}, {"label": "61235.22338", "count": 1, "selected": true}, {"label": "61237.35417", "count": 1, "selected": true}, {"label": "61239.25794", "count": 1, "selected": true}, {"label": "61242.29987", "count": 1, "selected": true}, {"label": "61244.17936", "count": 1, "selected": true}, {"label": "61245.17983", "count": 1, "selected": true}, {"label": "61246.19926", "count": 1, "selected": true}, {"label": "61247.17848", "count": 1, "selected": true}], "point_images": ["61165.40227", "61168.40418", "61170.38403", "61174.38190", "61175.37792", "61176.36555", "61177.37932", "61178.37032", "61179.37118", "61180.37615", "61181.36773", "61182.35498", "61183.38212", "61184.38450", "61185.34391", "61186.34301", "61187.33377", "61188.34782", "61189.34684", "61190.33215", "61191.33391", "61192.37722", "61193.36946", "61194.34702", "61196.33571", "61197.31399", "61202.30821", "61203.33841", "61204.28781", "61205.31498", "61207.37741", "61208.29609", "61210.33701", "61211.32824", "61212.28296", "61213.27863", "61214.27930", "61215.26297", "61216.27971", "61217.26912", "61218.26292", "61219.26205", "61220.26132", "61221.25955", "61222.25777", "61228.24544", "61229.23627", "61232.23122", "61233.28713", "61234.24968", "61235.22338", "61237.35417", "61239.25794", "61242.29987", "61244.17936", "61245.17983", "61246.19926", "61247.17848"]};
+      const PALETTE = ["royalblue", "mediumvioletred", "lightseagreen", "orange", "crimson", "teal", "goldenrod", "slateblue", "tomato", "seagreen"];
+      // Assign a different random day shift (1..100) to each curve on every page load.
+      // Uses unique picks without replacement up to 100; beyond 100, values will wrap.
+      function uniqueRandomShifts(n){
+        const pool = Array.from({length:100}, (_,i)=>i+1);
+        // Fisher-Yates shuffle
+        for (let i = pool.length - 1; i > 0; i--){
+          const j = Math.floor(Math.random() * (i + 1));
+          const t = pool[i]; pool[i] = pool[j]; pool[j] = t;
+        }
+        const out = [];
+        for (let k=0;k<n;k++){
+          out.push(pool[k % pool.length]);
+        }
+        return out;
+      }
+      (function assignRandomShifts(){
+        const shifts = uniqueRandomShifts(RAW.curves.length);
+        for (let i=0;i<RAW.curves.length;i++){
+          RAW.curves[i].randomShiftDays = shifts[i];
+        }
+      })();
+
+
+      function ensure(src, cb){
+        const s = document.createElement('script');
+        s.src = src; s.onload = cb; document.head.appendChild(s);
+      }
+      function boot(){ ensure('https://cdn.jsdelivr.net/npm/vue@2.7.16/dist/vue.min.js', function(){
+        ensure('https://cdn.plot.ly/plotly-2.35.2.min.js', start);
+      }); }
+
+      function start(){
+        const vm = new Vue({
+          el: '#app',
+          data: {
+            showDeltas: true,
+            curves: RAW.curves || [],
+            images: RAW.images || [],
+            activeCurve: null,
+          },
+          mounted(){ this.draw(); Vue.nextTick(()=>this.attachDrag()); },
+          methods: {
+
+            attachDrag(){
+              const gd = document.getElementById('plot');
+              const vm = this;
+              if (!gd || vm._dragHandlersAttached) return;
+              vm._dragHandlersAttached = true;
+
+              let dragging = false;
+              let startX = 0, startY = 0;
+              let originalDragmode = null;
+
+              function getScales(){
+                const fl = gd._fullLayout;
+                if (!fl || !fl.xaxis || !fl.yaxis) return {sx:1, sy:1};
+                const xr = fl.xaxis.range, yr = fl.yaxis.range;
+                const sx = (xr[1]-xr[0]) / (fl.xaxis._length || 1);
+                const sy = (yr[1]-yr[0]) / (fl.yaxis._length || 1);
+                return {sx, sy};
+              }
+
+              const onDown = (e) => {
+                if (!(e.ctrlKey || e.metaKey)) return; // only with Ctrl/⌘
+                if (!vm.activeCurve) return;
+                dragging = true;
+                startX = e.clientX; startY = e.clientY;
+                originalDragmode = (gd.layout && gd.layout.dragmode) || 'zoom';
+                Plotly.relayout(gd, {'dragmode':'none'});
+                e.preventDefault(); e.stopPropagation();
+              };
+
+              const onMove = (e) => {
+                if (!dragging || !vm.activeCurve) return;
+                const dx = e.clientX - startX;
+                const dy = e.clientY - startY;
+                const {sx, sy} = getScales();
+                vm.activeCurve.offsetX = (vm.activeCurve.offsetX || 0) + dx * sx;
+                vm.activeCurve.offsetY = (vm.activeCurve.offsetY || 0) - dy * sy;
+                startX = e.clientX; startY = e.clientY;
+                vm.draw(false);
+                e.preventDefault(); e.stopPropagation();
+              };
+
+              const onUp = () => {
+                if (!dragging) return;
+                dragging = false;
+                if (originalDragmode){ Plotly.relayout(gd, {'dragmode': originalDragmode}); }
+              };
+
+              gd.addEventListener('mousedown', onDown);
+              window.addEventListener('mousemove', onMove);
+              window.addEventListener('mouseup', onUp);
+              window.addEventListener('resize', () => Plotly.Plots.resize(gd));
+            },
+
+            selectAllImages(v){ /* panel removed */ this.draw(); },
+            filteredIndices(){
+              const img = RAW.point_images || [];
+              const out = [];
+              for (let i=0;i<img.length;i++){ out.push(i); }
+              return out;
+            },
+            buildTrace(c){
+              const idx = this.filteredIndices();
+              const xsAll = c.x, ysAll = c.y, errAll = c.err || [];
+              const xs = [], ys = [], es = [];
+              for (let k=0;k<xsAll.length;k++){
+                if (idx.indexOf(k) !== -1){
+                  xs.push(xsAll[k] + (c.offsetX || 0) + (c.randomShiftDays || 0));
+                  ys.push(ysAll[k] + (c.offsetY || 0));
+                  if (errAll.length === xsAll.length) es.push(errAll[k]);
+                }
+              }
+              const hasErr = es.length === xs.length && xs.length>0;
+            const t = {
+            x: xs, y: ys, name: c.name, mode: 'markers',
+            marker: { size: 6, color: c.color },
+            textfont: { color: 'white' },
+            visible: c.visible ? true : 'legendonly',
+            hovertemplate: 'mjd=%{x}<br>' + c.name + '_mag=%{y:.4f}' +
+                 (hasErr ? '<br>err=%{customdata:.4f}' : '') + '<extra></extra>',
+            hoverlabel: {
+            bgcolor: c.color,          // same color as the point
+            font: { color: 'white' },  // white text for readability
+            bordercolor: c.color       // optional, makes the border blend in
+            }
+            };
+              if (c.showErrors && hasErr){
+                t.error_y = { type: 'data', array: es, visible: true, color: c.color };
+                t.customdata = es;
+              }
+              return t;
+            },
+            draw(){
+              const traces = [];
+              for (const c of this.curves){
+                if (!c.visible) continue;
+                traces.push(this.buildTrace(c));
+              }
+              
+              // Ensure the active (dragged) curve is drawn on top by placing its trace last
+              if (this.activeCurve) {
+                const _i = traces.findIndex(t => t && t.name === this.activeCurve.name);
+                if (_i >= 0 && _i !== traces.length - 1) {
+                  const _t = traces.splice(_i, 1)[0];
+                  traces.push(_t);
+                }
+              }
+
+const gd = document.getElementById('plot');
+let currentRanges = null;
+if (gd && gd.layout && gd.layout.xaxis && gd.layout.yaxis) {
+  currentRanges = {
+    x: gd.layout.xaxis.range ? [...gd.layout.xaxis.range] : null,
+    y: gd.layout.yaxis.range ? [...gd.layout.yaxis.range] : null
+  };
+}
+
+const layout = {
+  margin: { t: 20, r: 20, b: 55, l: 70 },
+  xaxis: { title: 'mjd (MJD)' },
+  yaxis: { title: 'Magnitude (mag)', autorange: 'reversed' },
+  hoverlabel: { bgcolor: '#222', font: { color: 'white' } },
+  legend: { orientation: 'h' },
+};
+
+window.Plotly.react('plot', traces, layout, {displaylogo:false, responsive:true}).then(() => {
+  if (currentRanges && currentRanges.x && currentRanges.y) {
+    Plotly.relayout(gd, {
+      'xaxis.range': currentRanges.x,
+      'yaxis.range': currentRanges.y
+    });
+  }
+});
+},
+          }
+        });
+
+        // Click to activate curve; Cmd/Ctrl+Click to shift it to clicked coords
+        const plotDiv = document.getElementById('plot');
+        plotDiv.on = window.Plotly.d3.select(plotDiv).on; // ensure .on exists (Plotly binds d3 selection)
+
+        plotDiv.on('plotly_click', function(ev){
+          if (!ev || !ev.points || !ev.points.length) return;
+          const pt = ev.points[0];
+          const traceName = (pt.data && pt.data.name) ? pt.data.name : null;
+          if (traceName){
+            const clicked = vm.curves.find(c => c.name === traceName);
+            if (clicked) vm.activeCurve = clicked;
+          }
+          // Only shift with Cmd/Ctrl
+          if (!(ev.event && (ev.event.ctrlKey || ev.event.metaKey))) return;
+          if (!vm.activeCurve) return;
+
+          const xVal = pt.x, yVal = pt.y;
+          const idx = vm.filteredIndices();
+          let bestIdx = -1, bestDist = 1e99;
+          for (const k of idx){
+            const xi = vm.activeCurve.x[k] + (vm.activeCurve.offsetX || 0);
+            const yi = vm.activeCurve.y[k] + (vm.activeCurve.offsetY || 0);
+            const d2 = (xi - xVal)*(xi - xVal) + (yi - yVal)*(yi - yVal);
+            if (d2 < bestDist){ bestDist = d2; bestIdx = k; }
+          }
+          if (bestIdx >= 0){
+            const baseX = vm.activeCurve.x[bestIdx];
+            const baseY = vm.activeCurve.y[bestIdx];
+            vm.activeCurve.offsetX += (xVal - (baseX + (vm.activeCurve.offsetX||0)));
+            vm.activeCurve.offsetY += (yVal - (baseY + (vm.activeCurve.offsetY||0)));
+            vm.draw();
+          }
+        });
+      }
+
+      if (document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', boot); } else { boot(); }
+    })();
+  </script>
+</body>
+</html>
