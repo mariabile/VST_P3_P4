@@ -12,6 +12,12 @@ import pandas as pd
 PROGRAM_ID = "114.27U3.001"
 clean_id = PROGRAM_ID.lstrip("0")
 
+# The 9 official target coordinate designators for Program 114.27U3.001
+VALID_TARGET_PREFIXES = [
+    "0501", "0542", "0722", "1029", "2107", 
+    "0335", "1330", "0123", "2329"
+]
+
 
 def load_colors():
     """Loads colors.json if present, otherwise returns default color dictionary."""
@@ -34,6 +40,21 @@ def load_colors():
         "J0123": "#e4574f",
         "J2329": "#ff7f66",
     }
+
+
+def is_valid_science_target(target_str):
+    """Rejects placeholders and ensures target matches one of the 9 program science targets."""
+    if not target_str:
+        return False
+
+    t_upper = str(target_str).strip().upper()
+
+    # 1. Reject explicit non-science keywords
+    if any(bad in t_upper for bad in ["PLACEHOLDER", "PLCHLDR", "DUMMY", "TEST", "CALIB", "UNSET"]):
+        return False
+
+    # 2. Must match one of the 9 target designators
+    return any(prefix in t_upper for prefix in VALID_TARGET_PREFIXES)
 
 
 def get_target_color(target_name, color_map):
@@ -63,15 +84,15 @@ def generate_timeline_plot(observations):
     # Parse observations into DataFrame
     data_list = []
     for row in observations:
-        target = row[0].strip() if row[0] else "Unknown"
+        target = row[0].strip() if row[0] else ""
         exp_start = row[2]
-        if exp_start:
+        if exp_start and target:
             dt_display = parse_utc_dt(exp_start)
             data_list.append({"object": target, "dt_display": dt_display})
 
     df = pd.DataFrame(data_list)
     if df.empty:
-        print("No valid timestamps found for timeline plot.")
+        print("No valid target observations found for timeline plot.")
         return
 
     # Determine chronological order by first observation time per object
@@ -128,7 +149,7 @@ def generate_timeline_plot(observations):
     out_png = os.path.join("images", "P3_P4_timeline.png")
     fig.savefig(out_png, dpi=160, bbox_inches="tight")
     plt.close(fig)
-    print(f"Successfully generated and saved plot to: {out_png}")
+    print(f"Successfully generated dark timeline plot at: {out_png}")
 
 
 # --- Main Data Sync Execution ---
@@ -163,29 +184,39 @@ try:
         raw_observations = data.get("data", [])
         cleaned_observations = []
 
-        # --- Target Filtering and Name Replacements ---
+        kept_targets = set()
+        dropped_targets = set()
+
+        # --- Filter Placeholders and Rename Targets ---
         for row in raw_observations:
             if not row[0]:
                 continue
 
-            target_name = row[0].strip()
+            target_name = str(row[0]).strip()
 
-            # Ignore PLACEHOLDER TARGET entries completely
-            if "PLACEHOLDER" in target_name.upper():
+            # Rename COOL 1330 -> SDSS 1330
+            target_name = target_name.replace("COOL 1330", "SDSS 1330").replace("COOL J1330", "SDSS J1330")
+
+            if not is_valid_science_target(target_name):
+                dropped_targets.add(target_name)
                 continue
 
-            # Rename COOL 1330 to SDSS 1330
-            row[0] = target_name.replace("COOL 1330", "SDSS 1330").replace("COOL J1330", "SDSS J1330")
+            row[0] = target_name
             cleaned_observations.append(row)
+            kept_targets.add(target_name)
 
-        # Update data payload with cleaned observation records
+        print(f"Kept Targets ({len(kept_targets)}): {sorted(list(kept_targets))}")
+        if dropped_targets:
+            print(f"Filtered Out Non-Science / Placeholder Targets ({len(dropped_targets)}): {sorted(list(dropped_targets))}")
+
+        # Update JSON dataset
         data["data"] = cleaned_observations
 
         # 1. Save cleaned JSON dataset
         with open("data.json", "w") as f:
             json.dump(data, f, indent=2)
 
-        print(f"Saved {len(cleaned_observations)} observation records to data.json.")
+        print(f"Saved {len(cleaned_observations)} valid observation records to data.json.")
 
         # 2. Generate updated timeline plot
         generate_timeline_plot(cleaned_observations)
