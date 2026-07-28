@@ -342,8 +342,13 @@ return offsetDate.toISOString().split('T')[0];
 } 
 
 // Helper to generate ESO Archive / Night Log URL for a given target and night
-function getEsoNightLogUrl(target, night) {
-return `https://archive.eso.org/wdb/wdb/eso/eso_archive_main/query?prog_id=${PROGRAM_ID}&target=${encodeURIComponent(target)}&night=${night}`;
+function getEsoNightLogUrl(displayTarget, night) {
+let linkTarget = displayTarget;
+// Converts SDSS to COOL for target 1330 when querying ESO Archive
+if (linkTarget.includes('1330')) {
+  linkTarget = linkTarget.replace(/SDSS/gi, 'COOL');
+}
+return `https://archive.eso.org/wdb/wdb/eso/eso_archive_main/query?prog_id=${PROGRAM_ID}&target=${encodeURIComponent(linkTarget)}&night=${night}`;
 }
 
 async function loadData() { 
@@ -366,13 +371,20 @@ return;
 // Dynamically extract fields regardless of whether row is an array or object
 rawObservations = result.data.map(row => {
 const isArray = Array.isArray(row);
-const target = isArray ? row[0] : row.target;
+let target = isArray ? row[0] : row.target;
+target = target ? target.trim() : 'Unknown Target';
+
+// Ensure table display name uses SDSS instead of COOL for target 1330
+if (target.includes('1330')) {
+  target = target.replace(/COOL/gi, 'SDSS');
+}
+
 const instrument = isArray ? row[1] : row.instrument;
 const expStart = isArray ? row[2] : row.expStart;
 const filterVal = isArray ? row[3] : row.filter;
 
 return { 
-target: target ? target.trim() : 'Unknown Target', 
+target: target, 
 instrument: instrument || 'N/A', 
 expStart: expStart, 
 filter: filterVal || 'N/A', 
