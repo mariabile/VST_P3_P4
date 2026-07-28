@@ -363,14 +363,22 @@ nightSelect.innerHTML = `<option value="ALL">-- No Nights Available --</option>`
 return; 
 } 
 
-// Parse fields: [0]=target, [1]=instrument, [2]=exp_start, [3]=filter (adjust row index if needed)
-rawObservations = result.data.map(row => ({ 
-target: row[0] ? row[0].trim() : 'Unknown Target', 
-instrument: row[1] || 'N/A', 
-expStart: row[2], 
-filter: row[3] || 'N/A', 
-observingNight: getObservingNight(row[2]) 
-})); 
+// Dynamically extract fields regardless of whether row is an array or object
+rawObservations = result.data.map(row => {
+const isArray = Array.isArray(row);
+const target = isArray ? row[0] : row.target;
+const instrument = isArray ? row[1] : row.instrument;
+const expStart = isArray ? row[2] : row.expStart;
+const filterVal = isArray ? row[3] : row.filter;
+
+return { 
+target: target ? target.trim() : 'Unknown Target', 
+instrument: instrument || 'N/A', 
+expStart: expStart, 
+filter: filterVal || 'N/A', 
+observingNight: expStart ? getObservingNight(expStart) : 'N/A' 
+};
+}); 
 
 // Populate unique nights dropdown 
 const uniqueNights = [...new Set(rawObservations.map(o => o.observingNight))].sort(); 
@@ -440,7 +448,7 @@ let html = `
 `; 
 
 filtered.forEach(obs => { 
-const timeOnly = obs.expStart.replace('T', ' ').substring(0, 19); 
+const timeOnly = obs.expStart ? obs.expStart.replace('T', ' ').substring(0, 19) : 'N/A'; 
 const esoUrl = getEsoNightLogUrl(obs.target, obs.observingNight);
 html += ` 
 <tr> 
@@ -497,7 +505,7 @@ const targetList = Array.from(data.targets).map(target => {
   return `<a href="${esoUrl}" target="_blank" rel="noopener noreferrer" class="badge badge-link" title="View ESO Archive log for ${target} on ${night}">${target}</a>`;
 }).join(' '); 
 
-const filterList = Array.from(data.filters).join(', ') || 'N/A'; 
+const filterList = Array.from(data.filters).join(', ') || 'N/A';
 
 html += ` 
 <tr> 
