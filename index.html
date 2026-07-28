@@ -1,511 +1,538 @@
-<!DOCTYPE HTML>
-<!--
-	ZeroFour by HTML5 UP
-	html5up.net | @ajlkn
-	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
--->
-<html> 
-	<head>
-        <meta name="robots" content="noindex, nofollow">
-		<title>VST P3-P4</title>
-		<meta charset="utf-8" />
-		<link rel="stylesheet" href="assets/css/main.css" />
-		<style>
-			.lowercase {
-            	text-transform: lowercase;
-        	}
-
-			/* --- ESO Target Inspector Custom Styles --- */
-			.eso-inspector-container {
-				margin-top: 2.5em;
-				padding-top: 2em;
-				border-top: 2px solid #e5e5e5;
-			}
-
-			.controls-grid {
-				display: grid;
-				grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-				gap: 15px;
-				background: #f4f7f9;
-				padding: 20px;
-				border-radius: 6px;
-				margin-bottom: 20px;
-			}
-
-			.form-group {
-				display: flex;
-				flex-direction: column;
-			}
-
-			.form-group label {
-				font-weight: 600;
-				font-size: 0.85rem;
-				margin-bottom: 5px;
-				color: #475569;
-				text-transform: none;
-			}
-
-			.form-group select, .form-group input {
-				padding: 8px 12px;
-				border: 1px solid #dee2e6;
-				border-radius: 4px;
-				font-size: 0.95rem;
-				width: 100%;
-				box-sizing: border-box;
-				height: auto;
-				background: #ffffff;
-			}
-
-			/* Crisp status message box */
-			.status-msg {
-				margin-bottom: 15px;
-				font-style: normal;
-				font-weight: 600;
-				font-size: 0.95rem;
-				color: #1e293b;
-				background: #e2e8f0;
-				padding: 8px 14px;
-				border-radius: 6px;
-				display: inline-block;
-			}
-
-			.eso-table {
-				width: 100%;
-				border-collapse: collapse;
-				margin-top: 10px;
-			}
-
-			.eso-table th, .eso-table td {
-				border: 1px solid #cbd5e1;
-				padding: 12px 14px;
-				text-align: left;
-			}
-
-			/* Crisp, High-Legibility Header Override */
-			.eso-table th {
-				font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
-				background-color: #003366 !important;
-				color: #ffffff !important;
-				font-size: 0.95rem !important;
-				font-weight: 600 !important;
-				letter-spacing: 0.5px !important;
-				line-height: 1.4 !important;
-				text-transform: none !important;
-				-webkit-font-smoothing: antialiased !important;
-			}
-
-			.eso-table tr:nth-child(even) {
-				background-color: #f8fafc;
-			}
-
-			.badge {
-				background: #e2e8f0;
-				color: #1e293b;
-				padding: 4px 8px;
-				border-radius: 4px;
-				font-size: 0.88rem;
-				font-family: monospace;
-				font-weight: bold;
-				display: inline-block;
-				margin: 2px;
-			}
-
-			.table-footer-controls {
-				margin-top: 15px;
-				display: flex;
-				align-items: center;
-				justify-content: space-between;
-				flex-wrap: wrap;
-				gap: 10px;
-			}
-
-			.btn-toggle {
-				background-color: #003366 !important;
-				color: #ffffff !important;
-				border: none;
-				padding: 8px 18px;
-				border-radius: 4px;
-				cursor: pointer;
-				font-weight: 600;
-				font-size: 0.9rem;
-				box-shadow: none;
-			}
-
-			.btn-toggle:hover {
-				background-color: #0066cc !important;
-			}
-		</style>
-	</head>
-	<body class="homepage is-preload">
-		<div id="page-wrapper">
-
-			<!-- Header -->
-				<div id="header-wrapper-home">
-					<div class="container">
-
-						<!-- Header -->
-							<header id="header">
-								<div class="inner">
-
-									<!-- Logo -->
-										<div class="logo">
-										<a href="index.html" id="logo">
-										<img src="images/logo.png" >
-										 </a>
-										</div>
-
-									<!-- Nav -->
-										<nav id="nav">
-											<ul>
-												<li class="current_page_item"><a href="index.html">Home</a></li>
-												<li>
-													<a href="#">Lightcurves</a>
-													<ul>
-														<li><a href="J0501-0733_shift_page.html">J0501-0733</a></li>
-														<li><a href="J0542-2125_shift_page.html">J0542-2125</a></li>
-														<li><a href="J0722-3901_shift_page.html">J0722-3901</a></li>
-														<li><a href="J1029+2623_shift_page.html">J1029+2623</a></li>
-														<li><a href="J2107-1611_shift_page.html">J2107-1611</a></li>
-														<li><a href="J0335-1927_shift_page.html">J0335-1927</a></li>
-														<li><a href="J1330+1810_shift_page.html">J1330+1810</a></li>
-                                                        <li><a href="J2329-1258_shift_page.html">J2329-1258</a></li>														
-				                                        <li><a href="J0123-0455_shift_page.html">J0123-0455</a></li>
-										
-													</ul>
-												</li>
-												
-                                                <li>
-                                                    <a href="#">Ancillary Data</a>
-                                                    <ul>
-                                                        <li><a href="J0501-0733_anc.html">J0501-0733</a></li>
-                                                        <li><a href="J0542-2125_anc.html">J0542-2125</a></li>
-                                                        <li><a href="J0722-3901_anc.html">J0722-3901</a></li>
-                                                        <li><a href="J1029+2623_anc.html">J1029+2623</a></li>
-                                                        <li><a href="J2107-1611_anc.html">J2107-1611</a></li>
-                                                        <li><a href="J0335-1927_anc.html">J0335-1927</a></li>
-														<li><a href="J1330+1810_anc.html">J1330+1810</a></li>
-                                                        <li><a href="J2329-1258_anc.html">J2329-1258</a></li>
-														<li><a href="J0123-0455_anc.html">J0123-0455</a></li>
-                                                    </ul>
-                                                </li>
-												
-											</ul>
-										</nav>
-
-								</div>
-							</header>
-	<div id="banner">
-							</div>
-
-						</div>
-				</div>
-
-							
-
-			<!-- Main Wrapper -->
-				<div id="main-wrapper">
-					<div class="wrapper style1">
-						<div class="inner">
-
-							<!-- Feature 1 -->
-								<section class="container box feature1">
-									<div class="row">
-										<div class="col-12">
-											<header class="first major">
-											</header>
-											<h3>Targets</h3>
-
-											<figure>
-										  <img src="images/P3_P4_timeline.png" 
-    								   alt="Targets observed timeline" 
-  									     width="100%">
- 										<figcaption id="timeline-caption">Targets observed from 01/10/2024 to ...
-										</figcaption>
-										</figure>
-											
-										<!-- ESO Target Inspector Section -->
-										<div class="eso-inspector-container">
-											<h3>Observed Targets by Night (Program 114.27U3.001)</h3>
-
-											<div class="controls-grid">
-												<div class="form-group">
-													<label for="night-select">Select Specific Night</label>
-													<select id="night-select">
-														<option value="ALL">Loading observing nights...</option>
-													</select>
-												</div>
-
-												<div class="form-group">
-													<label for="start-date">From Date</label>
-													<input type="date" id="start-date">
-												</div>
-
-												<div class="form-group">
-													<label for="end-date">To Date</label>
-													<input type="date" id="end-date">
-												</div>
-
-												<div class="form-group">
-													<label for="sort-order">Sort Nights</label>
-													<select id="sort-order">
-														<option value="ASC">Oldest First</option>
-														<option value="DESC">Newest First</option>
-													</select>
-												</div>
-											</div>
-
-											<div id="status" class="status-msg">Loading data from archive...</div>
-											<div id="table-container"></div>
-										</div>
-
-										</div>
-									</div>
-								</section>
-
-						</div>
-					</div>
-
-
-			<!-- Footer Wrapper -->
-				<div id="footer-wrapper-logo">
-					<footer id="footer" class="container">
-						<div class="row">
-							<div class="col-3 col-6-medium col-12-small">
-								<!-- Contact -->
-									<section>
-										<h2>Contact us <i class="fa fa-envelope" style="font-size:20px; color:white;"></i></h2>
-										<div>
-											<div class="row">
-													<dl class="contact">
-														<a href="mailto:marianna.annunziatella@inaf.it">Marianna Annunziatella</a>
-													</dl>
-											</div>
-										</div>
-									</section>
-							</div>
-							<div class="col-3 col-6-medium col-12-small">
-								<h2 style="font-size:18px; ">Website last update: </h2>	<p style="font-size:16px; margin-top: -20px" > <script>document.write(  new Date(document.lastModified) );</script></p>
-							</div>
-
-							<div class="col-3 col-6-medium col-12-small">
-								<h2 style="font-size:18px; ">Website credits: </h2>	<p style="font-size:16px; margin-top: -20px" > M. Annunziatella </p>
-							</div>
-						</div>
-					</footer>
-				</div>
-
-		</div>
-
-		<!-- Scripts -->
-			<script src="assets/js/jquery.min.js"></script>
-			<script src="assets/js/jquery.dropotron.min.js"></script>
-			<script src="assets/js/browser.min.js"></script>
-			<script src="assets/js/breakpoints.min.js"></script>
-			<script src="assets/js/util.js"></script>
-			<script src="assets/js/main.js"></script>
-
-		<!-- ESO Data Loader Script -->
-		<script>
-			let rawObservations = [];
-			let showAllRows = false;
-
-			// Subtracts 12 hours so post-midnight exposures match the observing night
-			function getObservingNight(utcDateString) {
-				const d = new Date(utcDateString);
-				const offsetDate = new Date(d.getTime() - (12 * 60 * 60 * 1000));
-				return offsetDate.toISOString().split('T')[0];
-			}
-
-			async function loadData() {
-				const statusEl = document.getElementById('status');
-				const nightSelect = document.getElementById('night-select');
-				const captionEl = document.getElementById('timeline-caption');
-
-				try {
-					const response = await fetch('./data.json?v=' + new Date().getTime());
-					if (!response.ok) throw new Error("data.json not ready yet.");
-
-					const result = await response.json();
-
-					if (!result.data || result.data.length === 0) {
-						statusEl.textContent = "No observations found for Program ID 114.27U3.001.";
-						nightSelect.innerHTML = `<option value="ALL">-- No Nights Available --</option>`;
-						return;
-					}
-
-					// Parse fields: [0]=target, [1]=instrument, [2]=exp_start, [3]=tel_airm_start, [4]=tel_ambi_fwhm_start
-					rawObservations = result.data.map(row => ({
-						target: row[0] ? row[0].trim() : 'Unknown Target',
-						instrument: row[1] || 'N/A',
-						expStart: row[2],
-						airmass: row[3] ? parseFloat(row[3]).toFixed(2) : 'N/A',
-						seeing: row[4] ? parseFloat(row[4]).toFixed(2) + '"' : 'N/A',
-						observingNight: getObservingNight(row[2])
-					}));
-
-					// Populate unique nights dropdown
-					const uniqueNights = [...new Set(rawObservations.map(o => o.observingNight))].sort();
-					nightSelect.innerHTML = `<option value="ALL">All Nights (${uniqueNights.length})</option>`;
-					
-					uniqueNights.forEach(night => {
-						const opt = document.createElement('option');
-						opt.value = night;
-						opt.textContent = night;
-						nightSelect.appendChild(opt);
-					});
-
-					// Update figure caption with latest query date formatted DD/MM/YYYY
-					if (uniqueNights.length > 0) {
-						const lastNight = uniqueNights[uniqueNights.length - 1]; // Latest night
-						const [yyyy, mm, dd] = lastNight.split('-');
-						captionEl.textContent = `Targets observed from 01/10/2024 to ${dd}/${mm}/${yyyy}`;
-					}
-
-					// Shows strictly the total number of observing nights
-					statusEl.textContent = `${uniqueNights.length} observing night(s) loaded.`;
-					renderTable();
-
-				} catch (err) {
-					console.error(err);
-					statusEl.textContent = "Data is generating in the cloud. Run the GitHub Action or wait 1 minute and refresh.";
-				}
-			}
-
-			function toggleRowsDisplay() {
-				showAllRows = !showAllRows;
-				renderTable();
-			}
-
-			function renderTable() {
-				const selectedNight = document.getElementById('night-select').value;
-				const startDate = document.getElementById('start-date').value;
-				const endDate = document.getElementById('end-date').value;
-				const sortOrder = document.getElementById('sort-order').value;
-				const tableContainer = document.getElementById('table-container');
-
-				let filtered = rawObservations.filter(obs => {
-					if (selectedNight !== 'ALL' && obs.observingNight !== selectedNight) return false;
-					if (startDate && obs.observingNight < startDate) return false;
-					if (endDate && obs.observingNight > endDate) return false;
-					return true;
-				});
-
-				if (filtered.length === 0) {
-					tableContainer.innerHTML = "<p>No target observations match the selected criteria.</p>";
-					return;
-				}
-
-				// SPECIFIC NIGHT SELECTED: Exposure breakdown with seeing & airmass
-				if (selectedNight !== 'ALL') {
-					let html = `
-						<h4>Observing Night: ${selectedNight}</h4>
-						<table class="eso-table">
-							<thead>
-								<tr>
-									<th>Target</th>
-									<th>Instrument</th>
-									<th>Start Time (UTC)</th>
-									<th>Airmass</th>
-									<th>Seeing (FWHM)</th>
-								</tr>
-							</thead>
-							<tbody>
-					`;
-
-					filtered.forEach(obs => {
-						const timeOnly = obs.expStart.replace('T', ' ').substring(0, 19);
-						html += `
-							<tr>
-								<td><span class="badge">${obs.target}</span></td>
-								<td>${obs.instrument}</td>
-								<td>${timeOnly}</td>
-								<td>${obs.airmass}</td>
-								<td>${obs.seeing}</td>
-							</tr>
-						`;
-					});
-
-					html += `</tbody></table>`;
-					tableContainer.innerHTML = html;
-					return;
-				}
-
-				// ALL NIGHTS SELECTED: Aggregated summary table
-				const nightGroups = {};
-				filtered.forEach(obs => {
-					if (!nightGroups[obs.observingNight]) {
-						nightGroups[obs.observingNight] = { targets: new Set(), instruments: new Set(), airmasses: [], seeings: [] };
-					}
-					nightGroups[obs.observingNight].targets.add(obs.target);
-					nightGroups[obs.observingNight].instruments.add(obs.instrument);
-					if (obs.airmass !== 'N/A') nightGroups[obs.observingNight].airmasses.push(parseFloat(obs.airmass));
-					if (obs.seeing !== 'N/A') nightGroups[obs.observingNight].seeings.push(parseFloat(obs.seeing));
-				});
-
-				let nightKeys = Object.keys(nightGroups).sort();
-				if (sortOrder === 'DESC') {
-					nightKeys.reverse();
-				}
-
-				const totalNights = nightKeys.length;
-				const displayKeys = showAllRows ? nightKeys : nightKeys.slice(0, 10);
-
-				let html = `
-					<table class="eso-table">
-						<thead>
-							<tr>
-								<th>Observing Night</th>
-								<th>Targets Observed</th>
-								<th>Instrument(s)</th>
-								<th>Avg Airmass</th>
-								<th>Avg Seeing</th>
-							</tr>
-						</thead>
-						<tbody>
-				`;
-
-				displayKeys.forEach(night => {
-					const data = nightGroups[night];
-					const targetList = Array.from(data.targets).map(t => `<span class="badge">${t}</span>`).join(' ');
-					const avgAirmass = data.airmasses.length ? (data.airmasses.reduce((a,b)=>a+b, 0)/data.airmasses.length).toFixed(2) : 'N/A';
-					const avgSeeing = data.seeings.length ? (data.seeings.reduce((a,b)=>a+b, 0)/data.seeings.length).toFixed(2) + '"' : 'N/A';
-					
-					html += `
-						<tr>
-							<td><strong>${night}</strong></td>
-							<td>${targetList}</td>
-							<td>${Array.from(data.instruments).join(', ')}</td>
-							<td>${avgAirmass}</td>
-							<td>${avgSeeing}</td>
-						</tr>
-					`;
-				});
-
-				html += `</tbody></table>`;
-
-				// Pagination controls below table
-				if (totalNights > 10) {
-					const buttonText = showAllRows ? `Show First 10 Nights` : `Show All ${totalNights} Nights`;
-					const rangeText = showAllRows ? `Showing all ${totalNights} observing nights` : `Showing first 10 of ${totalNights} observing nights`;
-					
-					html += `
-						<div class="table-footer-controls">
-							<span><strong>${rangeText}</strong></span>
-							<button class="btn-toggle" onclick="toggleRowsDisplay()">${buttonText}</button>
-						</div>
-					`;
-				}
-
-				tableContainer.innerHTML = html;
-			}
-
-			document.getElementById('night-select').addEventListener('change', renderTable);
-			document.getElementById('start-date').addEventListener('change', renderTable);
-			document.getElementById('end-date').addEventListener('change', renderTable);
-			document.getElementById('sort-order').addEventListener('change', renderTable);
-
-			window.addEventListener('DOMContentLoaded', loadData);
-		</script>
-
-	</body>
+<!DOCTYPE HTML> 
+<!-- 
+ZeroFour by HTML5 UP 
+html5up.net | @ajlkn 
+Free for personal and commercial use under the CCA 3.0 license (html5up.net/license) 
+--> 
+<html>  
+<head> 
+        <meta name="robots" content="noindex, nofollow"> 
+<title>VST P3-P4</title> 
+<meta charset="utf-8" /> 
+<link rel="stylesheet" href="assets/css/main.css" /> 
+<style> 
+.lowercase { 
+            text-transform: lowercase; 
+        } 
+
+/* --- ESO Target Inspector Custom Styles --- */ 
+.eso-inspector-container { 
+margin-top: 2.5em; 
+padding-top: 2em; 
+border-top: 2px solid #e5e5e5; 
+} 
+
+.controls-grid { 
+display: grid; 
+grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); 
+gap: 15px; 
+background: #f4f7f9; 
+padding: 20px; 
+border-radius: 6px; 
+margin-bottom: 20px; 
+} 
+
+.form-group { 
+display: flex; 
+flex-direction: column; 
+} 
+
+.form-group label { 
+font-weight: 600; 
+font-size: 0.85rem; 
+margin-bottom: 5px; 
+color: #475569; 
+text-transform: none; 
+} 
+
+.form-group select, .form-group input { 
+padding: 8px 12px; 
+border: 1px solid #dee2e6; 
+border-radius: 4px; 
+font-size: 0.95rem; 
+width: 100%; 
+box-sizing: border-box; 
+height: auto; 
+background: #ffffff; 
+} 
+
+/* Crisp status message box */ 
+.status-msg { 
+margin-bottom: 15px; 
+font-style: normal; 
+font-weight: 600; 
+font-size: 0.95rem; 
+color: #1e293b; 
+background: #e2e8f0; 
+padding: 8px 14px; 
+border-radius: 6px; 
+display: inline-block; 
+} 
+
+.eso-table { 
+width: 100%; 
+border-collapse: collapse; 
+margin-top: 10px; 
+} 
+
+.eso-table th, .eso-table td { 
+border: 1px solid #cbd5e1; 
+padding: 12px 14px; 
+text-align: left; 
+} 
+
+/* Crisp, High-Legibility Header Override */ 
+.eso-table th { 
+font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important; 
+background-color: #003366 !important; 
+color: #ffffff !important; 
+font-size: 0.95rem !important; 
+font-weight: 600 !important; 
+letter-spacing: 0.5px !important; 
+line-height: 1.4 !important; 
+text-transform: none !important; 
+-webkit-font-smoothing: antialiased !important; 
+} 
+
+.eso-table tr:nth-child(even) { 
+background-color: #f8fafc; 
+} 
+
+.badge { 
+background: #e2e8f0; 
+color: #1e293b; 
+padding: 4px 8px; 
+border-radius: 4px; 
+font-size: 0.88rem; 
+font-family: monospace; 
+font-weight: bold; 
+display: inline-block; 
+margin: 2px; 
+text-decoration: none;
+transition: all 0.2s ease-in-out;
+} 
+
+a.badge-link {
+color: #003366;
+border: 1px solid #cbd5e1;
+}
+
+a.badge-link:hover {
+background: #003366;
+color: #ffffff;
+border-color: #003366;
+text-decoration: none;
+}
+
+.eso-log-link {
+color: #003366;
+font-weight: 600;
+text-decoration: none;
+font-size: 0.88rem;
+}
+
+.eso-log-link:hover {
+color: #0066cc;
+text-decoration: underline;
+}
+
+.table-footer-controls { 
+margin-top: 15px; 
+display: flex; 
+align-items: center; 
+justify-content: space-between; 
+flex-wrap: wrap; 
+gap: 10px; 
+} 
+
+.btn-toggle { 
+background-color: #003366 !important; 
+color: #ffffff !important; 
+border: none; 
+padding: 8px 18px; 
+border-radius: 4px; 
+cursor: pointer; 
+font-weight: 600; 
+font-size: 0.9rem; 
+box-shadow: none; 
+} 
+
+.btn-toggle:hover { 
+background-color: #0066cc !important; 
+} 
+</style> 
+</head> 
+<body class="homepage is-preload"> 
+<div id="page-wrapper"> 
+
+<!-- Header --> 
+<div id="header-wrapper-home"> 
+<div class="container"> 
+
+<!-- Header --> 
+<header id="header"> 
+<div class="inner"> 
+
+<!-- Logo --> 
+<div class="logo"> 
+<a href="index.html" id="logo"> 
+<img src="images/logo.png" > 
+</a> 
+</div> 
+
+<!-- Nav --> 
+<nav id="nav"> 
+<ul> 
+<li class="current_page_item"><a href="index.html">Home</a></li> 
+<li> 
+<a href="#">Lightcurves</a> 
+<ul> 
+<li><a href="J0501-0733_shift_page.html">J0501-0733</a></li> 
+<li><a href="J0542-2125_shift_page.html">J0542-2125</a></li> 
+<li><a href="J0722-3901_shift_page.html">J0722-3901</a></li> 
+<li><a href="J1029+2623_shift_page.html">J1029+2623</a></li> 
+<li><a href="J2107-1611_shift_page.html">J2107-1611</a></li> 
+<li><a href="J0335-1927_shift_page.html">J0335-1927</a></li> 
+<li><a href="J1330+1810_shift_page.html">J1330+1810</a></li> 
+<li><a href="J2329-1258_shift_page.html">J2329-1258</a></li>
+<li><a href="J0123-0455_shift_page.html">J0123-0455</a></li> 
+</ul> 
+</li> 
+<li> 
+<a href="#">Ancillary Data</a> 
+<ul> 
+<li><a href="J0501-0733_anc.html">J0501-0733</a></li> 
+<li><a href="J0542-2125_anc.html">J0542-2125</a></li> 
+<li><a href="J0722-3901_anc.html">J0722-3901</a></li> 
+<li><a href="J1029+2623_anc.html">J1029+2623</a></li> 
+<li><a href="J2107-1611_anc.html">J2107-1611</a></li> 
+<li><a href="J0335-1927_anc.html">J0335-1927</a></li> 
+<li><a href="J1330+1810_anc.html">J1330+1810</a></li> 
+<li><a href="J2329-1258_anc.html">J2329-1258</a></li> 
+<li><a href="J0123-0455_anc.html">J0123-0455</a></li> 
+</ul> 
+</li> 
+</ul> 
+</nav> 
+
+</div> 
+</header> 
+<div id="banner"> 
+</div> 
+
+</div> 
+</div> 
+
+
+<!-- Main Wrapper --> 
+<div id="main-wrapper"> 
+<div class="wrapper style1"> 
+<div class="inner"> 
+
+<!-- Feature 1 --> 
+<section class="container box feature1"> 
+<div class="row"> 
+<div class="col-12"> 
+<header class="first major"> 
+</header> 
+<h3>Targets</h3> 
+
+<figure> 
+ <img src="images/P3_P4_timeline.png"  
+      alt="Targets observed timeline"  
+      width="100%"> 
+  <figcaption id="timeline-caption">Targets observed from 01/10/2024 to ... 
+</figcaption> 
+</figure> 
+
+<!-- ESO Target Inspector Section --> 
+<div class="eso-inspector-container"> 
+<h3>Observed Targets by Night (Program 114.27U3.001)</h3> 
+
+<div class="controls-grid"> 
+<div class="form-group"> 
+<label for="night-select">Select Specific Night</label> 
+<select id="night-select"> 
+<option value="ALL">Loading observing nights...</option> 
+</select> 
+</div> 
+
+<div class="form-group"> 
+<label for="start-date">From Date</label> 
+<input type="date" id="start-date"> 
+</div> 
+
+<div class="form-group"> 
+<label for="end-date">To Date</label> 
+<input type="date" id="end-date"> 
+</div> 
+
+<div class="form-group"> 
+<label for="sort-order">Sort Nights</label> 
+<select id="sort-order"> 
+<option value="ASC">Oldest First</option> 
+<option value="DESC">Newest First</option> 
+</select> 
+</div> 
+</div> 
+
+<div id="status" class="status-msg">Loading data from archive...</div> 
+<div id="table-container"></div> 
+</div> 
+
+</div> 
+</div> 
+</section> 
+
+</div> 
+</div> 
+
+
+<!-- Footer Wrapper --> 
+<div id="footer-wrapper-logo"> 
+<footer id="footer" class="container"> 
+<div class="row"> 
+<div class="col-3 col-6-medium col-12-small"> 
+<!-- Contact --> 
+<section> 
+<h2>Contact us <i class="fa fa-envelope" style="font-size:20px; color:white;"></i></h2> 
+<div> 
+<div class="row"> 
+<dl class="contact"> 
+<a href="mailto:marianna.annunziatella@inaf.it">Marianna Annunziatella</a> 
+</dl> 
+</div> 
+</div> 
+</section> 
+</div> 
+<div class="col-3 col-6-medium col-12-small"> 
+<h2 style="font-size:18px; ">Website last update: </h2> <p style="font-size:16px; margin-top: -20px" > <script>document.write( new Date(document.lastModified) );</script></p> 
+</div> 
+
+<div class="col-3 col-6-medium col-12-small"> 
+<h2 style="font-size:18px; ">Website credits: </h2> <p style="font-size:16px; margin-top: -20px" > M. Annunziatella </p> 
+</div> 
+</div> 
+</footer> 
+</div> 
+
+</div> 
+
+<!-- Scripts --> 
+<script src="assets/js/jquery.min.js"></script> 
+<script src="assets/js/jquery.dropotron.min.js"></script> 
+<script src="assets/js/browser.min.js"></script> 
+<script src="assets/js/breakpoints.min.js"></script> 
+<script src="assets/js/util.js"></script> 
+<script src="assets/js/main.js"></script> 
+
+<!-- ESO Data Loader Script --> 
+<script> 
+let rawObservations = []; 
+let showAllRows = false; 
+
+// Program ID constant for generating direct ESO Archive / Nightlog links
+const PROGRAM_ID = "114.27U3.001";
+
+// Subtracts 12 hours so post-midnight exposures match the observing night 
+function getObservingNight(utcDateString) { 
+const d = new Date(utcDateString); 
+const offsetDate = new Date(d.getTime() - (12 * 60 * 60 * 1000)); 
+return offsetDate.toISOString().split('T')[0]; 
+} 
+
+// Helper to generate ESO Archive / Night Log URL for a given target and night
+function getEsoNightLogUrl(target, night) {
+return `https://archive.eso.org/wdb/wdb/eso/eso_archive_main/query?prog_id=${PROGRAM_ID}&target=${encodeURIComponent(target)}&night=${night}`;
+}
+
+async function loadData() { 
+const statusEl = document.getElementById('status'); 
+const nightSelect = document.getElementById('night-select'); 
+const captionEl = document.getElementById('timeline-caption'); 
+
+try { 
+const response = await fetch('./data.json?v=' + new Date().getTime()); 
+if (!response.ok) throw new Error("data.json not ready yet."); 
+
+const result = await response.json(); 
+
+if (!result.data || result.data.length === 0) { 
+statusEl.textContent = `No observations found for Program ID ${PROGRAM_ID}.`; 
+nightSelect.innerHTML = `<option value="ALL">-- No Nights Available --</option>`; 
+return; 
+} 
+
+// Parse fields: [0]=target, [1]=instrument, [2]=exp_start, [3]=filter (adjust row index if needed)
+rawObservations = result.data.map(row => ({ 
+target: row[0] ? row[0].trim() : 'Unknown Target', 
+instrument: row[1] || 'N/A', 
+expStart: row[2], 
+filter: row[3] || 'N/A', 
+observingNight: getObservingNight(row[2]) 
+})); 
+
+// Populate unique nights dropdown 
+const uniqueNights = [...new Set(rawObservations.map(o => o.observingNight))].sort(); 
+nightSelect.innerHTML = `<option value="ALL">All Nights (${uniqueNights.length})</option>`; 
+uniqueNights.forEach(night => { 
+const opt = document.createElement('option'); 
+opt.value = night; 
+opt.textContent = night; 
+nightSelect.appendChild(opt); 
+}); 
+
+// Update figure caption with latest query date formatted DD/MM/YYYY 
+if (uniqueNights.length > 0) { 
+const lastNight = uniqueNights[uniqueNights.length - 1]; // Latest night 
+const [yyyy, mm, dd] = lastNight.split('-'); 
+captionEl.textContent = `Targets observed from 01/10/2024 to ${dd}/${mm}/${yyyy}`; 
+} 
+
+statusEl.textContent = `${uniqueNights.length} observing night(s) loaded.`; 
+renderTable(); 
+
+} catch (err) { 
+console.error(err); 
+statusEl.textContent = "Data is generating in the cloud. Run the GitHub Action or wait 1 minute and refresh."; 
+} 
+} 
+
+function toggleRowsDisplay() { 
+showAllRows = !showAllRows; 
+renderTable(); 
+} 
+
+function renderTable() { 
+const selectedNight = document.getElementById('night-select').value; 
+const startDate = document.getElementById('start-date').value; 
+const endDate = document.getElementById('end-date').value; 
+const sortOrder = document.getElementById('sort-order').value; 
+const tableContainer = document.getElementById('table-container'); 
+
+let filtered = rawObservations.filter(obs => { 
+if (selectedNight !== 'ALL' && obs.observingNight !== selectedNight) return false; 
+if (startDate && obs.observingNight < startDate) return false; 
+if (endDate && obs.observingNight > endDate) return false; 
+return true; 
+}); 
+
+if (filtered.length === 0) { 
+tableContainer.innerHTML = "<p>No target observations match the selected criteria.</p>"; 
+return; 
+} 
+
+// SPECIFIC NIGHT SELECTED: Detailed exposure breakdown with filter & night log link
+if (selectedNight !== 'ALL') { 
+let html = ` 
+<h4>Observing Night: ${selectedNight}</h4> 
+<table class="eso-table"> 
+<thead> 
+<tr> 
+<th>Target</th> 
+<th>Instrument</th> 
+<th>Filter</th> 
+<th>Start Time (UTC)</th> 
+<th>ESO Log / Archive</th> 
+</tr> 
+</thead> 
+<tbody> 
+`; 
+
+filtered.forEach(obs => { 
+const timeOnly = obs.expStart.replace('T', ' ').substring(0, 19); 
+const esoUrl = getEsoNightLogUrl(obs.target, obs.observingNight);
+html += ` 
+<tr> 
+<td><a href="${esoUrl}" target="_blank" rel="noopener noreferrer" class="badge badge-link">${obs.target}</a></td> 
+<td>${obs.instrument}</td> 
+<td><strong>${obs.filter}</strong></td> 
+<td>${timeOnly}</td> 
+<td><a href="${esoUrl}" target="_blank" rel="noopener noreferrer" class="eso-log-link">View ESO Log &rarr;</a></td> 
+</tr> 
+`; 
+}); 
+
+html += `</tbody></table>`; 
+tableContainer.innerHTML = html; 
+return; 
+} 
+
+// ALL NIGHTS SELECTED: Aggregated summary table 
+const nightGroups = {}; 
+filtered.forEach(obs => { 
+if (!nightGroups[obs.observingNight]) { 
+nightGroups[obs.observingNight] = { targets: new Set(), instruments: new Set(), filters: new Set() }; 
+} 
+nightGroups[obs.observingNight].targets.add(obs.target); 
+nightGroups[obs.observingNight].instruments.add(obs.instrument); 
+if (obs.filter && obs.filter !== 'N/A') nightGroups[obs.observingNight].filters.add(obs.filter); 
+}); 
+
+let nightKeys = Object.keys(nightGroups).sort(); 
+if (sortOrder === 'DESC') { 
+nightKeys.reverse(); 
+} 
+
+const totalNights = nightKeys.length; 
+const displayKeys = showAllRows ? nightKeys : nightKeys.slice(0, 10); 
+
+let html = ` 
+<table class="eso-table"> 
+<thead> 
+<tr> 
+<th>Observing Night</th> 
+<th>Targets Observed (Click to view ESO Log)</th> 
+<th>Instrument(s)</th> 
+<th>Filter(s)</th> 
+</tr> 
+</thead> 
+<tbody> 
+`; 
+
+displayKeys.forEach(night => { 
+const data = nightGroups[night]; 
+const targetList = Array.from(data.targets).map(target => {
+  const esoUrl = getEsoNightLogUrl(target, night);
+  return `<a href="${esoUrl}" target="_blank" rel="noopener noreferrer" class="badge badge-link" title="View ESO Archive log for ${target} on ${night}">${target}</a>`;
+}).join(' '); 
+
+const filterList = Array.from(data.filters).join(', ') || 'N/A'; 
+
+html += ` 
+<tr> 
+<td><strong>${night}</strong></td> 
+<td>${targetList}</td> 
+<td>${Array.from(data.instruments).join(', ')}</td> 
+<td><strong>${filterList}</strong></td> 
+</tr> 
+`; 
+}); 
+
+html += `</tbody></table>`; 
+
+// Pagination controls below table 
+if (totalNights > 10) { 
+const buttonText = showAllRows ? `Show First 10 Nights` : `Show All ${totalNights} Nights`; 
+const rangeText = showAllRows ? `Showing all ${totalNights} observing nights` : `Showing first 10 of ${totalNights} observing nights`; 
+html += ` 
+<div class="table-footer-controls"> 
+<span><strong>${rangeText}</strong></span> 
+<button class="btn-toggle" onclick="toggleRowsDisplay()">${buttonText}</button> 
+</div> 
+`; 
+} 
+
+tableContainer.innerHTML = html; 
+} 
+
+document.getElementById('night-select').addEventListener('change', renderTable); 
+document.getElementById('start-date').addEventListener('change', renderTable); 
+document.getElementById('end-date').addEventListener('change', renderTable); 
+document.getElementById('sort-order').addEventListener('change', renderTable); 
+
+window.addEventListener('DOMContentLoaded', loadData); 
+</script> 
+
+</body> 
 </html>
