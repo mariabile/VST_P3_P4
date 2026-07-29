@@ -73,8 +73,13 @@ def parse_utc_dt(utc_str):
     return dt - timedelta(hours=12)
 
 
+def get_observing_night(utc_str):
+    """Returns the YYYY-MM-DD string representing the observing night date."""
+    return parse_utc_dt(utc_str).strftime("%Y-%m-%d")
+
+
 def generate_timeline_plot(observations):
-    """Generates and saves the dark-themed timeline figure matching obs_timeline.py."""
+    """Generates and saves the dark-themed timeline figure grouped by observing night."""
     if not observations:
         print("No observations available to generate timeline plot.")
         return
@@ -86,9 +91,15 @@ def generate_timeline_plot(observations):
     for row in observations:
         target = row[0].strip() if row[0] else ""
         exp_start = row[2]
+        obs_night = row[5] if len(row) > 5 else get_observing_night(exp_start)
+        
         if exp_start and target:
             dt_display = parse_utc_dt(exp_start)
-            data_list.append({"object": target, "dt_display": dt_display})
+            data_list.append({
+                "object": target, 
+                "dt_display": dt_display,
+                "obs_night": obs_night
+            })
 
     df = pd.DataFrame(data_list)
     if df.empty:
@@ -113,7 +124,7 @@ def generate_timeline_plot(observations):
     # Get colors per observation point
     colors = [get_target_color(obj, color_map) for obj in df["object"].values]
 
-    # Scatter plot
+    # Scatter plot using night-shifted datetimes
     ax.scatter(
         df["dt_display"].values,
         y_vals.values,
@@ -125,7 +136,7 @@ def generate_timeline_plot(observations):
 
     # Format Axes
     ax.set_yticks(list(y_map.values()), list(y_map.keys()))
-    ax.set_xlabel("Date (UTC)", labelpad=10)
+    ax.set_xlabel("Observing Night (UTC Date at Start of Night)", labelpad=10)
     ax.set_ylabel("Target", labelpad=10)
 
     # X-axis date formatting (monthly ticks)
@@ -153,7 +164,11 @@ def generate_timeline_plot(observations):
 
 
 # --- Main Data Sync Execution ---
-query = f"SELECT target, instrument, exp_start, tel_airm_start, tel_ambi_fwhm_start FROM dbo.raw WHERE (prog_id LIKE '%{clean_id}%' OR prog_id LIKE '%{PROGRAM_ID}%') AND dp_cat = 'SCIENCE' ORDER BY exp_start ASC"
+query = (
+    f"SELECT target, instrument, exp_start, tel_airm_start, tel_ambi_fwhm_start "
+    f"FROM dbo.raw WHERE (prog_id LIKE '%{clean_id}%' OR prog_id LIKE '%{PROGRAM_ID}%') "
+    f"AND dp_cat = 'SCIENCE' ORDER BY exp_start ASC"
+)
 
 print(f"Connecting to ESO TAP service for program {PROGRAM_ID}...")
 url = "https://archive.eso.org/tap_obs/sync"
@@ -187,7 +202,7 @@ try:
         kept_targets = set()
         dropped_targets = set()
 
-        # --- Filter Placeholders and Rename Targets ---
+        # --- Filter Placeholders, Rename Targets & Assign Observing Night ---
         for row in raw_observations:
             if not row[0]:
                 continue
@@ -202,17 +217,25 @@ try:
                 continue
 
             row[0] = target_name
-            cleaned_observations.append(row)
+            
+            # Compute observing night (YYYY-MM-DD of evening start)
+            obs_night = get_observing_night(row[2])
+            
+            # Append observing night to the record row
+            updated_row = row + [obs_night]
+            cleaned_observations.append(updated_row)
             kept_targets.add(target_name)
 
         print(f"Kept Targets ({len(kept_targets)}): {sorted(list(kept_targets))}")
         if dropped_targets:
             print(f"Filtered Out Non-Science / Placeholder Targets ({len(dropped_targets)}): {sorted(list(dropped_targets))}")
 
-        # Update JSON dataset
+        # Update fields header and JSON dataset
+        if "fields" in data:
+            data["fields"].append({"name": "obs_night", "datatype": "char"})
         data["data"] = cleaned_observations
 
-        # 1. Save cleaned JSON dataset
+        # 1. Save cleaned JSON dataset with observing night association
         with open("data.json", "w") as f:
             json.dump(data, f, indent=2)
 
