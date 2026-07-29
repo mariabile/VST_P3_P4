@@ -1894,7 +1894,7 @@ input, select, textarea {
 		background: url("images/cutout-CDS_P_DESI-Legacy-Surveys_DR10_color.jpg");
 		background-position: top;
 		background-size: cover;
-		width: 110%;
+		width: 100%;
 		background-repeat: no-repeat;
 		padding: 3em 0;
 	}
