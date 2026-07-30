@@ -2041,15 +2041,19 @@ input, select, textarea {
 
 
 		.logo {
-  		flex: 0 0 auto;
-  		padding: 0px;  /* optional */
-		align-self: flex-start; 
-		}
-		.logo img {
-  		min-height: 150px;
-  		width: auto;
-		margin-top: -28px;
-		}
+  flex: 0 0 auto;
+  padding: 0px;
+  align-self: flex-start; 
+  pointer-events: none; /* Lets clicks/taps pass through empty container space */
+}
+
+.logo img,
+.logo a {
+  min-height: 150px;
+  width: auto;
+  margin-top: -28px;
+  pointer-events: auto; /* Restores clickability strictly on the image/link */
+}
 
 
 		#header h1 {
