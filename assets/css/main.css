@@ -2040,17 +2040,84 @@ input, select, textarea {
 
 
 
-		.logo {
+	.logo {
 			display: inline-block;
 			vertical-align: top;
 			max-width: 100px;
 			height: 50px;
 			margin-right: 20px;
-			margin-top: 18px; 
+			margin-top: 0px; 
 			margin-left: 10px;   /* if you want it vertically middle of the navbar. */
 		}
 
+/* --- Logo & Navbar Text Styling --- */
+.logo a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+}
 
+.logo-text {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #b1b7fa;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+.logo-text sup {
+    font-size: 0.65em;
+    top: -0.4em;
+    color: #b1b7fa; /* Accent light blue matching logo glow */
+}
+
+/* Override fixed max-width on logo container so text fits */
+.logo {
+    max-width: none !important;
+    height: auto !important;
+    margin-top: 0 !important;
+}
+
+/* --- Hero Brand Section (Before Plot) --- */
+.hero-brand-section {
+    text-align: center;
+    padding: 2.5rem 1rem 2rem 1rem;
+    margin-bottom: 2rem;
+}
+
+.hero-logo {
+    max-width: 280px;
+    height: auto;
+    margin: 0 auto 1.5rem auto;
+    display: block;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.08));
+}
+
+.hero-title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--primary-navy);
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+    margin: 0 auto;
+    max-width: 900px;
+    text-transform: none; /* Keeps sentence formatting */
+}
+
+.hero-title .accent-text {
+    color: var(--primary-accent);
+}
+
+@media screen and (max-width: 736px) {
+    .hero-title {
+        font-size: 1.4rem !important;
+    }
+    .hero-logo {
+        max-width: 200px;
+    }
+}
 		#header h1 {
 			position: absolute;
 			left: 1.75em;
