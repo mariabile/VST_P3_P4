@@ -564,7 +564,7 @@ function renderTable() {
             const firstNight = nights[0];
             const lastNight = nights[nights.length - 1];
             
-            // Build a separate, styled summary table
+            // Build a separate, styled summary table using standard badge styling
             summaryHtml = `
             <h4 style="margin-bottom:0.75rem;">Target Summary: ${selectedTarget}</h4> 
             <div class="table-responsive-wrapper" style="margin-bottom: 2rem;">
@@ -579,7 +579,7 @@ function renderTable() {
                     </thead> 
                     <tbody> 
                         <tr>
-                            <td><span class="badge" style="background: var(--primary-accent); color: white;">${selectedTarget}</span></td>
+                            <td><span class="badge">${selectedTarget}</span></td>
                             <td>${filtered.length}</td>
                             <td><strong>${firstNight}</strong></td>
                             <td><strong>${lastNight}</strong></td>
