@@ -29,10 +29,28 @@
 
     <div class="grid">
       <div>
+      
+    <!-- ADDED DISCLAIMER ON TOP OF THE CURVES -->
+        <div class="card" style="margin-bottom: 12px; padding: 10px; background: #FFF8D9; border-color: #edc46b;">
+          <p style="color: #edc46b; font-weight: bold; font-size: 14px; margin: 0; text-align: center;">
+            ⚠️ The lightcurves are randomly shifted every time the page is reload.
+          </p>
+        </div>
+
+      
         <div id="plot" class="card"></div>
       </div>
 
       <div class="controls sticky">
+        <!-- NEW IMAGE CARD -->
+        <div class="card">
+          <h3 class="cp-title" style="margin-top: 0; margin-bottom: 10px;">Image</h3>
+          <img src="images/J2107-1611_VST/J2107-1611_cutout.png" alt="J2107-1611" style="width: 100%; height: auto; border-radius: 4px; border: 1px solid #ddd; display: block;">
+        <p style="color: #e63946; font-weight: bold; font-size: 13px; margin-top: 12px; margin-bottom: 0; text-align: center;">
+            ⚠️ Note: Images A1, A2, and A3 are blended in VST data.
+          </p>
+        </div>
+        
         <div class="card">
           <h3 class="cp-title">Curves</h3>
           <div class="row" v-for="c in curves" :key="c.name">
@@ -118,7 +136,7 @@
                 marker: { size: 6, color: c.color },
                 textfont: { color: 'white' },
                 visible: c.visible ? true : 'legendonly',
-                hovertemplate: 'mjd=%{x}<br>' + c.name + '_mag=%{y:.4f}' +
+                hovertemplate: c.name + '_mag=%{y:.4f}' +
                      (hasErr ? '<br>err=%{customdata:.4f}' : '') + '<extra></extra>',
                 hoverlabel: {
                   bgcolor: c.color,          // same color as the point
