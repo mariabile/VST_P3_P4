@@ -9,12 +9,6 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-  # Also redeploy after the daily ESO data update: commits made by the
-  # Actions bot do not trigger the 'push' event above on their own.
-  workflow_run:
-    workflows: ["ESO Data Auto-Sync"]
-    types: [completed]
-
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read
